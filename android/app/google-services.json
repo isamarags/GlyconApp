@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "393667460067",
+    "project_id": "glyconapp",
+    "storage_bucket": "glyconapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:393667460067:android:187efec655090b4fd43ed6",
+        "android_client_info": {
+          "package_name": "com.example.glycon_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGjbOdmkQduXtfumZUmM0InYYnUV4HNCg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
