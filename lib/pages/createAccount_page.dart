@@ -124,15 +124,27 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         child: TextFormField(
                           // controller: nomecompletoController,
                           style: GoogleFonts.montserrat(
-                              fontSize: 19,
-                              fontWeight: FontWeight.normal,
-                              decorationColor: Color(0xFF4B0D07),
-                              letterSpacing: 0),
+                            color: Color(0xFF4B0D07),
+                            fontSize: 19,
+                            fontWeight: FontWeight.normal,
+                            decorationColor: Color(0xFF4B0D07),
+                            letterSpacing: 0
+                          ),
                           decoration: InputDecoration(
-                              hintText: 'Nome completo',
-                              border: InputBorder.none,
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 20)),
+                            hintText: 'Nome completo',
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.transparent, // Define a cor como transparente
+                              ),
+                            ),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.transparent, // Define a cor como transparente
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(height: 20),
@@ -154,6 +166,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         child: TextFormField(
                           // controller: emailController,
                           style: GoogleFonts.montserrat(
+                              decorationColor: Color(0xFF4B0D07),
                               fontSize: 19,
                               fontWeight: FontWeight.normal,
                               color: Color(0xFF4B0D07)),
@@ -184,6 +197,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         child: TextFormField(
                           // controller: senhaController,
                           style: GoogleFonts.montserrat(
+                              decorationColor: Color(0xFF4B0D07),
                               fontSize: 20,
                               fontWeight: FontWeight.normal,
                               color: Color(0xFF4B0D07)),
@@ -214,6 +228,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         child: TextFormField(
                           // controller: confirmarsenhaController,
                           style: GoogleFonts.montserrat(
+                              decorationColor: Color(0xFF4B0D07),
                               fontSize: 19,
                               fontWeight: FontWeight.normal,
                               color: Color(0xFF4B0D07)),

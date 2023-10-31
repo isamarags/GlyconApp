@@ -1,0 +1,298 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+import 'package:glycon_app/Widgets/HeightSelectionDialog.dart';
+import 'package:glycon_app/Widgets/WeightPicker.dart';
+
+class CreateAccountPageOne extends StatefulWidget {
+  final String? selectedWeight;
+
+  const CreateAccountPageOne({Key? key, this.selectedWeight}) : super(key: key);
+
+  @override
+  State<CreateAccountPageOne> createState() => _CreateAccountPageOneState();
+}
+
+class _CreateAccountPageOneState extends State<CreateAccountPageOne> {
+  TextEditingController weightController = TextEditingController();
+
+  DateTime selectedDate = DateTime.now();
+
+  List<String> gender = ["", "Masculino", "Feminino"];
+  String selectedGender = "";
+
+  double selectedHeight = 0.0;
+
+  String selectedWeight = '';
+
+  void openHeightSelectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return HeightSelectionDialog();
+      },
+    );
+  }
+
+  void openWeightPicker(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return WeightPicker(
+          selectedWeight: selectedWeight,
+          weightController: weightController,
+          onWeightChanged: (newWeight) { // Adicione esta linha
+            setState(() {
+              selectedWeight = newWeight; // Atualize a variável selectedWeight aqui
+            });
+          },
+        );
+      },
+    );
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        height: MediaQuery.of(context).size.height, // Fix the height here
+        child: ListView(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.symmetric(horizontal: 39),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(height: 80),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Nos conte mais sobre você',
+                      style: GoogleFonts.montserrat(
+                        color: Color(0xFF4B0D07),
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Seus parâmetros individuais são importantes para uma personalização detalhada',
+                    style: GoogleFonts.montserrat(
+                      color: Color(0xFFB98282),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 50),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.person, color: Color(0xFF4B0D07)),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Genero',
+                        style: GoogleFonts.montserrat(
+                            color: Color(0xFFB98282),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      SizedBox(width: 128),
+                      DropdownButton<String>(
+                        value: selectedGender,
+                        onChanged: (String? newGender) {
+                          setState(() {
+                            selectedGender = newGender!;
+                          });
+                        },
+                        items: gender.map((String gender) {
+                          return DropdownMenuItem<String>(
+                            value: gender,
+                            child: Text(
+                              gender,
+                              style: GoogleFonts.montserrat(
+                                color: Color(0xFF4B0D07),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      Spacer(),
+                    ],
+                  ),
+                  SizedBox(height: 30),
+                  Divider(
+                    color: Color(0xFFF0F0F0),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.calendar_today,
+                            color: Color(0xFF4B0D07)),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Data de nascimento',
+                        style: GoogleFonts.montserrat(
+                          color: Color(0xFFB98282),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: selectedDate,
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                          ).then((date) {
+                            if (date != null && date != selectedDate) {
+                              setState(() {
+                                selectedDate = date;
+                              });
+                            }
+                          });
+                        },
+                        child: Text(
+                          '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFF4B0D07),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 30),
+                  Divider(
+                    color: Color(0xFFF0F0F0),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.fitness_center,
+                            color: Color(0xFF4B0D07)),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Peso (kg)',
+                        style: GoogleFonts.montserrat(
+                          color: Color(0xFFB98282),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () => openWeightPicker(context),
+                        child: Text(
+                          'Selecionar',
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFF4B0D07),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 30),
+                  Divider(
+                    color: Color(0xFFF0F0F0),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 24,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.height, color: Color(0xFF4B0D07)),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Altura (cm)',
+                        style: GoogleFonts.montserrat(
+                          color: Color(0xFFB98282),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Spacer(),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () => openHeightSelectionDialog(context),
+                        child: Text(
+                          'Selecionar',
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFF4B0D07),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 100),
+                  ElevatedButton(
+                    onPressed: () => context.go('/createAccount_Two'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFD8A9A9),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      minimumSize: Size(250, 54),
+                    ),
+                    child: Text(
+                      'Continuar',
+                      style: GoogleFonts.montserrat(
+                        color: Color(0xFF4B0D07),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
