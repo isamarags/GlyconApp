@@ -5,13 +5,13 @@ import 'package:go_router/go_router.dart';
 // import 'package:glycon_app/assets/colors/colors.dart';
 import 'package:glycon_app/pages/createAccount_page.dart';
 import 'package:glycon_app/pages/login_page.dart';
-import 'package:glycon_app/pages/createAccount_pageOne.dart';
-import 'package:glycon_app/pages/createAccount_pageTwo.dart';
+import 'package:glycon_app/Widgets/About.dart';
+import 'package:glycon_app/Widgets/Health.dart';
 import 'package:glycon_app/pages/home_page.dart';
-import 'package:glycon_app/pages/registerItem.dart';
 import 'package:glycon_app/pages/metasPage.dart';
 import 'package:glycon_app/pages/sharePage.dart';
 import 'package:glycon_app/pages/accountPage.dart';
+import 'Widgets/InsertBloodGlucose.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -40,15 +40,15 @@ final GoRouter _router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/createAccount_One',
+      path: '/about',
       builder: (BuildContext context, GoRouterState state) {
-        return const CreateAccountPageOne();
+        return const About();
       },
     ),
     GoRoute(
-      path: '/createAccount_Two',
+      path: '/health',
       builder: (BuildContext context, GoRouterState state) {
-        return const CreateAccountPageTwo();
+        return const Health();
       },
     ),
     GoRoute(
@@ -92,12 +92,6 @@ final GoRouter _router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/registerItem',
-      builder: (BuildContext context, GoRouterState state) {
-        return RegisterItemPage();
-      },
-    ),
-    GoRoute(
       path: '/sharePage',
       builder: (BuildContext context, GoRouterState state) {
         return SharePage();
@@ -107,6 +101,12 @@ final GoRouter _router = GoRouter(
       path: '/accountPage',
       builder: (BuildContext context, GoRouterState state) {
         return AccountPage();
+      },
+    ),
+    GoRoute(
+      path: '/insertBloodGlucose',
+      builder: (BuildContext context, GoRouterState state) {
+        return InsertBloodGlucose();
       },
     ),
   ]

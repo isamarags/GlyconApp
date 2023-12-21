@@ -266,7 +266,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           ),
                         ),
                         child: ElevatedButton(
-                          onPressed: () => context.go('/createAccount_One'),
+                          onPressed: () => context.go('/about'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFFD8A9A9),
                             shape: RoundedRectangleBorder(

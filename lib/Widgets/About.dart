@@ -4,17 +4,17 @@ import 'package:go_router/go_router.dart';
 import 'package:glycon_app/Widgets/HeightSelectionDialog.dart';
 import 'package:glycon_app/Widgets/WeightPicker.dart';
 
-class CreateAccountPageOne extends StatefulWidget {
+class About extends StatefulWidget {
   final String? selectedWeight;
 
-  const CreateAccountPageOne({Key? key, this.selectedWeight}) : super(key: key);
+  const About({Key? key, this.selectedWeight}) : super(key: key);
 
   @override
-  State<CreateAccountPageOne> createState() => _CreateAccountPageOneState();
+  State<About> createState() => _AboutState();
 }
 
-class _CreateAccountPageOneState extends State<CreateAccountPageOne> {
-  TextEditingController weightController = TextEditingController();
+class _AboutState extends State<About> {
+TextEditingController weightController = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
 
@@ -41,9 +41,9 @@ class _CreateAccountPageOneState extends State<CreateAccountPageOne> {
         return WeightPicker(
           selectedWeight: selectedWeight,
           weightController: weightController,
-          onWeightChanged: (newWeight) { // Adicione esta linha
+          onWeightChanged: (newWeight) {
             setState(() {
-              selectedWeight = newWeight; // Atualize a variável selectedWeight aqui
+              selectedWeight = newWeight; 
             });
           },
         );
@@ -51,13 +51,12 @@ class _CreateAccountPageOneState extends State<CreateAccountPageOne> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        height: MediaQuery.of(context).size.height, // Fix the height here
+        height: MediaQuery.of(context).size.height,
         child: ListView(
           children: [
             Container(
@@ -270,7 +269,7 @@ class _CreateAccountPageOneState extends State<CreateAccountPageOne> {
                   ),
                   SizedBox(height: 100),
                   ElevatedButton(
-                    onPressed: () => context.go('/createAccount_Two'),
+                    onPressed: () => context.go('/health'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFD8A9A9),
                       shape: RoundedRectangleBorder(

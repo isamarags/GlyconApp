@@ -48,6 +48,10 @@ dependencies:
   multiselect: ^0.1.0 
 
   intl: ^0.18.1 
+
+  sliding_up_panel: ^2.0.0+1
+
+  datetime_picker_formfield_new: ^2.1.0
   
 
   # The following adds the Cupertino Icons font to your application.

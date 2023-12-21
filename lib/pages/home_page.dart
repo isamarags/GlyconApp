@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:glycon_app/pages/registerItem.dart';
-import 'package:glycon_app/pages/metasPage.dart';
-import 'package:glycon_app/pages/sharePage.dart';
-import 'package:glycon_app/pages/accountPage.dart';
+import 'package:glycon_app/Widgets/CustomBottomNavigationBarItem.dart';
+import 'package:glycon_app/Widgets/AddOptionsPanel.dart';
+import 'package:glycon_app/Widgets/BuildHealthItem.dart';
 import 'package:go_router/go_router.dart';
 
 class LandingPage extends StatefulWidget {
@@ -17,30 +15,55 @@ class LandingPage extends StatefulWidget {
 class _LandingPageState extends State<LandingPage> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    LandingPage(),
-    MetasPage(),
-    RegisterItemPage(), 
-    SharePage(),
-    AccountPage()
-  ];
+  void _showSlidingUpPanel() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return AddOptionsPanel(); // Chama o widget personalizado
+      },
+    );
+  }
 
-  
+  void _navigateToPage(int index) {
+    final router = GoRouter.of(context);
 
-  void _onItemTapped(int index) {
-  setState(() {
-    _selectedIndex = index;
-  });
+    switch (index) {
+      case 0:
+        router.go('/homePage');
+        break;
+      case 1:
+        router.go('/metas');
+        break;
+      case 2:
+        _showSlidingUpPanel();
+        break;
+      case 3:
+        router.go('/sharePage');
+        break;
+      case 4:
+        router.go('/accountPage');
+        break;
+    }
+  }
 
-}
+  void Function(int)? _onNavigationItemSelected(int index) {
+    _navigateToPage(index);
+  }
 
   BottomNavigationBarItem _buildIcon(int index, IconData icon, String label) {
-    final isSelected = index == _selectedIndex;
-    final color = isSelected ? Color(0xFFBA8383) : Color(0xFFEFDFD8);
+    final customItem = CustomBottomNavigationBarItem(
+      index: index,
+      icon: icon,
+      label: label,
+      selectedIndex: _selectedIndex,
+      onTap: () => _onNavigationItemSelected(index),
+    );
 
     return BottomNavigationBarItem(
-      icon: Icon(icon, color: color),
-      label: label,
+      icon: Icon(customItem.icon),
+      label: customItem.label,
     );
   }
 
@@ -50,79 +73,7 @@ class _LandingPageState extends State<LandingPage> {
     Color(0xFFFAD5CD),
   ];
 
-  Widget _buildHealthItem(String imagePath, String title, String description,
-      Color backgroundColor, String dateTime) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 10),
-      decoration: const BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Color(0xFFE7F1FF), // Cor da sombra
-            blurRadius: 8.0, // soften the shadow
-            spreadRadius: 5.0,
-            offset: Offset(2, 4),
-          ),
-        ],
-      ),
-      child: Container(
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Image.asset(
-                imagePath, // Caminho da imagem que você deseja exibir
-              ),
-            ),
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF4B0D07),
-                      fontWeight: FontWeight.w500),
-                ),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF4B0D07),
-                  ),
-                ),
-                SizedBox(height: 15),
-                Text(
-                  dateTime,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                )
-              ],
-            ),
-            Spacer(),
-            IconButton(
-              icon: Icon(Icons.more_vert),
-              onPressed: () {
-                // Adicione ação para o ícone de reticências aqui
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -130,19 +81,16 @@ class _LandingPageState extends State<LandingPage> {
         DateFormat('dd MMMM - HH:mm').format(DateTime.now());
 
     return Scaffold(
-      backgroundColor: Colors.white, // Cor de fundo do Scaffold
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.symmetric(
-              vertical: 50,
-              horizontal: 25), // Espaçamento antes e depois da AppBar
+          margin: EdgeInsets.symmetric(vertical: 50, horizontal: 25),
           padding: EdgeInsets.only(top: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.only(
-                    left: 15), // Adiciona espaçamento à esquerda
+                padding: EdgeInsets.only(left: 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -177,16 +125,12 @@ class _LandingPageState extends State<LandingPage> {
                         ),
                         Spacer(),
                         Container(
-                          padding: EdgeInsets.only(
-                              right:
-                                  20), // Espaçamento à direita para os ícones
+                          padding: EdgeInsets.only(right: 20),
                           child: IconButton(
                             icon: Icon(Icons.menu),
                             iconSize: 40,
                             color: Color(0xFF4B0D07),
-                            onPressed: () {
-                              // Adicione ação para o ícone do menu aqui
-                            },
+                            onPressed: () {},
                           ),
                         ),
                       ],
@@ -245,39 +189,37 @@ class _LandingPageState extends State<LandingPage> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500),
                           ),
-                          Spacer(), // Espaçamento flexível para empurrar o ícone para a direita
+                          Spacer(),
                           IconButton(
                             icon: Icon(Icons.more_vert),
-                            onPressed: () {
-                              // Adicione ação para o ícone de reticências aqui
-                            },
+                            onPressed: () {},
                           ),
                         ],
                       ),
                     ),
                     SizedBox(height: 10),
-                    _buildHealthItem(
-                      'lib/assets/images/medication.png',
-                      'Medicamentos',
-                      '2 remédios tomados',
-                      backgroundColors[0],
-                      formattedDateTime,
+                    BuildHealthItem(
+                      imagePath: 'lib/assets/images/medication.png',
+                      title: 'Medicamentos',
+                      description: '2 remédios tomados',
+                      backgroundColor: backgroundColors[0],
+                      dateTime: formattedDateTime,
                     ),
                     SizedBox(height: 10),
-                    _buildHealthItem(
-                      'lib/assets/images/insulin.png',
-                      'Insulina',
-                      'NPH',
-                      backgroundColors[1],
-                      formattedDateTime,
+                    BuildHealthItem(
+                      imagePath: 'lib/assets/images/insulin.png',
+                      title: 'Insulina',
+                      description: 'NPH',
+                      backgroundColor: backgroundColors[1],
+                      dateTime: formattedDateTime,
                     ),
                     SizedBox(height: 10),
-                    _buildHealthItem(
-                      'lib/assets/images/food.png',
-                      'Alimentação',
-                      'Lanche da tarde',
-                      backgroundColors[2],
-                      formattedDateTime,
+                    BuildHealthItem(
+                      imagePath: 'lib/assets/images/food.png',
+                      title: 'Alimentação',
+                      description: 'Lanche da tarde',
+                      backgroundColor: backgroundColors[2],
+                      dateTime: formattedDateTime,
                     ),
                   ],
                 ),
@@ -288,17 +230,12 @@ class _LandingPageState extends State<LandingPage> {
       ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
-          canvasColor: null, // Define a cor de fundo como transparente
+          canvasColor: null,
         ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
-          onTap: (int index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          type: BottomNavigationBarType
-              .fixed, // Define o tipo de barra inferior como fixo para evitar realces de cor
+          onTap: _navigateToPage,
+          type: BottomNavigationBarType.fixed,
           items: [
             _buildIcon(0, Icons.home, 'Home'),
             _buildIcon(1, Icons.star, 'Metas'),

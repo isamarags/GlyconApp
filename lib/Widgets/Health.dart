@@ -6,14 +6,14 @@ import 'package:go_router/go_router.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 
-class CreateAccountPageTwo extends StatefulWidget {
-  const CreateAccountPageTwo({super.key});
+class Health extends StatefulWidget {
+  const Health({super.key});
 
   @override
-  State<CreateAccountPageTwo> createState() => _CreateAccountPageTwoState();
+  State<Health> createState() => _HealthState();
 }
 
-class _CreateAccountPageTwoState extends State<CreateAccountPageTwo> {
+class _HealthState extends State<Health> {
   DateTime selectedDate = DateTime.now();
 
   List<String> typeDiabetes = ["", "Tipo 1", "Tipo 2", "Gestacional"];
@@ -189,7 +189,7 @@ class _CreateAccountPageTwoState extends State<CreateAccountPageTwo> {
                     Spacer(),
                   ],
                 ),
-SizedBox(height: 30),
+                SizedBox(height: 30),
                 Divider(
                   color: Color(0xFFF0F0F0),
                   thickness: 1,
