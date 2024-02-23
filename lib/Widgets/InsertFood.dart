@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:glycon_app/services/datePickerService.dart';
-import 'package:glycon_app/services/FirebaseFunctions.dart';
+import 'package:customizable_counter/customizable_counter.dart';
 
-class InsertBloodGlucose extends StatefulWidget {
-  final String userId;
-  final void Function() onDataRegistered;
+class InsertFood extends StatefulWidget {
   final VoidCallback closeOptionsPanel;
 
-  const InsertBloodGlucose({Key? key, required this.userId, required this.onDataRegistered, required this.closeOptionsPanel,}) : super(key: key);
+  const InsertFood({Key? key, required this.closeOptionsPanel}) : super(key: key);
   
 
   @override
-  _InsertBloodGlucoseState createState() => _InsertBloodGlucoseState();
+  _InsertFoodState createState() => _InsertFoodState();
 }
 
-class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
+class _InsertFoodState extends State<InsertFood> {
   late DateTime selectedDate;
   late TimeOfDay selectedTime;
   bool beforeMealSelected = false;
   bool afterMealSelected = false;
   TextEditingController glucoseLevelController = TextEditingController();
   TextEditingController dateTimeController = TextEditingController();
-  
-
 
   @override
   void initState() {
@@ -30,7 +26,6 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
     selectedDate = DateTime.now();
     selectedTime = TimeOfDay.now();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +37,8 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
 
     final double verticalPadding = screenHeight * verticalPaddingPercent;
     final double horizontalPadding = screenWidth * horizontalPaddingPercent;
+    
+    double quantity = 1;
 
     return Container(
       decoration: BoxDecoration(
@@ -60,7 +57,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Glicemia',
+              'Alimento',
               style: TextStyle(
                 fontSize: 20,
                 color: Color(0xFF4B0D07),
@@ -68,7 +65,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
               ),
             ),
             SizedBox(height: 15),
-            Row(
+          Row(
               children: [
                 Expanded(
                     child: Stack(
@@ -131,7 +128,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Nível de glicose no sangue',
+                  'Alimento',
                   style: TextStyle(
                     fontSize: 16,
                     color: Color(0xFF4B0D07),
@@ -158,7 +155,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
-                      suffixText: 'mg/dl',
+                      suffixText: '',
                       suffixStyle: TextStyle(
                         color: Color(0xFF4B0D07),
                         fontWeight: FontWeight.w500,
@@ -178,60 +175,52 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
             ),
             SizedBox(height: 15),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: screenWidth * 0.38, // Ajuste o tamanho dos botões
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        beforeMealSelected = !beforeMealSelected;
-
-                        if (beforeMealSelected) {
-                          afterMealSelected = false;
-                        }
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 8), // Ajuste o padding vertical
-                      backgroundColor: beforeMealSelected ?
-                          Color(0xFF4B0D07) : Color(0xFFD8A9A9),
-                    ),
-                    child: Text('Antes da refeição',
-                      style: TextStyle(
-                        fontSize: 14, // Ajuste o tamanho do texto
-                        color: beforeMealSelected ?
-                            Color(0xFFD8A9A9) : Color(0xFF4B0D07),
-                      ),
-                    ),
+                Text(
+                  'Quantidade',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF4B0D07),
+                    fontWeight: FontWeight.w500,
                   ),
+                  textAlign: TextAlign.start,
                 ),
-                SizedBox(width: 10), // Ajuste o espaço entre os botões para evitar o overflow
-                SizedBox(
-                  width: screenWidth * 0.38, // Ajuste o tamanho dos botões
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        afterMealSelected = !afterMealSelected;
-                        
-                        if(afterMealSelected) {
-                            beforeMealSelected = false;
-                        }
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 8), // Ajuste o padding vertical
-                      backgroundColor: afterMealSelected ?
-                          Color(0xFF4B0D07) : Color(0xFFD8A9A9),
-                    ),
-                    child: Text('Depois da refeição',
-                      style: TextStyle(
-                        fontSize: 14, // Ajuste o tamanho do texto
-                        color: afterMealSelected ?
-                            Color(0xFFD8A9A9) : Color(0xFF4B0D07),
-                      ),
-                    ),
+                SizedBox(width: 20),  // Adjust the spacing between the text and the counter if needed
+                CustomizableCounter(
+                  borderColor: Colors.transparent,
+                  borderWidth: 0,
+                  showButtonText: true,
+                  borderRadius: 8.0,
+                  backgroundColor: Color(0xFFD8A9A9),
+                  textColor: Color(0xFF4B0D07),
+                  textSize: 16,
+                  count: quantity,
+                  step: 1,
+                  minCount: 1,
+                  maxCount: 10,
+                  incrementIcon: const Icon(
+                    Icons.add,
+                    color: Color(0xFF4B0D07),
                   ),
+                  decrementIcon: const Icon(
+                    Icons.remove,
+                    color: Color(0xFF4B0D07),
+                  ),
+                  onCountChange: (count) {
+                    // Handle count change if needed
+                  },
+                  onIncrement: (count) {
+                    setState(() {
+                      quantity = count;
+                    });
+                  },
+                  onDecrement: (count) {
+                    setState(() {
+                      quantity = count;
+                    });
+                  },
                 ),
               ],
             ),
@@ -242,18 +231,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
                 if (glucoseLevelController.text.isNotEmpty &&
                     beforeMealSelected != afterMealSelected) {
                   // Lógica para salvar os dados
-                  dateTimeController.text = "${selectedDate.toLocal()} ${selectedTime.format(context)}";
-
-                   FirebaseFunctions.saveGlucoseToFirestore(
-                    selectedDate: selectedDate,
-                    glucoseLevel: glucoseLevelController.text,
-                    beforeMealSelected: beforeMealSelected,
-                    afterMealSelected: afterMealSelected,
-                    userId: widget.userId, // Use o userId do widget pai
-                  );
-
                   // Navigator.pop(context);
-                  widget.onDataRegistered();
                   widget.closeOptionsPanel();
                 } else {
                   // Mostra um pop-up informando que é obrigatório preencher todos os campos
@@ -268,7 +246,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
                           ),
                         ),
                         content: Text(
-                          'Para salvar o seu nível de glicose, por favor preencha todos os campos!',
+                          'Para salvar o alimento, por favor preencha todos os campos!',
                           style: TextStyle(
                             color: Color(0xFF4B0D07)
                           ),),

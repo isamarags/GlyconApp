@@ -1,9 +1,28 @@
 import 'package:flutter/material.dart';
+// import 'package:glycon_app/Widgets/InsertBloodGlucose.dart';
+import 'package:glycon_app/utils/sliding_up_functions.dart';
 import 'package:go_router/go_router.dart';
-import 'package:glycon_app/Widgets/InsertBloodGlucose.dart';
+
 
 class AddOptionsPanel extends StatefulWidget {
-  const AddOptionsPanel({super.key});
+  final String userId;
+  final void Function() onDataRegistered;
+  String? newGlucoseValue;
+  String? glucoseValue;
+  // String? newPillValue;
+  // String? pillValue;
+  final void Function() onClose;
+  AddOptionsPanel(
+      {Key? key,
+      required this.userId,
+      required this.onDataRegistered,
+      required this.glucoseValue,
+      required this.newGlucoseValue,
+      required this.onClose,
+      // required this.newPillValue,
+      // required this.pillValue
+      })
+      : super(key: key);
 
   @override
   State<AddOptionsPanel> createState() => _AddOptionsPanelState();
@@ -22,16 +41,23 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
     final double verticalPadding = screenHeight * verticalPaddingPercent;
     final double horizontalPadding = screenWidth * horizontalPaddingPercent;
 
-    void showSlidingUpBloodGlucose() {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) {
-          return InsertBloodGlucose(); // Chama o widget personalizado
-        },
-      );
+    void _updateGlucoseValue() {
+      setState(() {
+        // Atualiza o valor da glicose com o novo valor
+        widget.glucoseValue = widget.newGlucoseValue!;
+      });
+
+      widget.onClose();
     }
+
+    // void _updatePillValue() {
+    //   setState(() {
+    //     // Atualiza o valor da glicose com o novo valor
+    //     widget.pillValue = widget.newPillValue!;
+    //   });
+
+    //   widget.onClose();
+    // }
 
     void _navigateToPage(int index) {
       final router = GoRouter.of(context);
@@ -44,7 +70,7 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
           router.go('/metas');
           break;
         case 2:
-          showSlidingUpBloodGlucose();
+          showSlidingUpBloodGlucose(context, widget.userId, () => _updateGlucoseValue());
           break;
         case 3:
           router.go('/sharePage');
@@ -55,13 +81,23 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
       }
     }
 
+
     void Function(int)? _onNavigationItemSelected(int index) {
       _navigateToPage(index);
 
-        if (index == 2) {
-          showSlidingUpBloodGlucose();
+      if (index == 0) {
+        // Função intermediária sem argumentos
+        void updateGlucoseValueWithoutArgument() {
+          _updateGlucoseValue();
         }
+
+        // Passa a função intermediária
+        showSlidingUpBloodGlucose(context, widget.userId, updateGlucoseValueWithoutArgument);
+      }
+      return null;
     }
+
+
 
     return Container(
       decoration: BoxDecoration(
@@ -89,7 +125,11 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
             ),
             SizedBox(height: 15),
             ElevatedButton(
-              onPressed: () => showSlidingUpBloodGlucose(),
+              onPressed: (){ 
+                showSlidingUpBloodGlucose(context, widget.userId, (){
+                  _updateGlucoseValue();
+                });
+                },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),
                 foregroundColor: Color(0xFF4B0D07),
@@ -108,7 +148,7 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-
+                showSlidingUpInsulin(context, widget.userId);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),
@@ -128,7 +168,7 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-                // Lógica quando o botão 'Medicamento' é pressionado
+                showSlidingUpPill(context, widget.userId);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),
@@ -148,7 +188,7 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-                // Lógica quando o botão 'Alimento' é pressionado
+                showSlidingUpFood(context, widget.userId);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),

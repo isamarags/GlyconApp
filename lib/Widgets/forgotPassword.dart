@@ -1,32 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-import 'package:glycon_app/services/signInUser.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:glycon_app/services/sendpasswordreset.dart';
 
-
-class LoginPage extends StatefulWidget {
+class ForgotPassword extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _ForgotPasswordState createState() => _ForgotPasswordState();
 }
 
 
-class _LoginPageState extends State<LoginPage> {
-  bool _passwordVisible = false;
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void onPressedPassword() {
-    setState(() {
-      _passwordVisible = !_passwordVisible;
-    });
-  }
+class _ForgotPasswordState extends State<ForgotPassword> {
+  final _emailController = TextEditingController();
+  final _sendPasswordReset = SendPasswordReset();
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
                 right: 0,
                 child: Container(
                   width: MediaQuery.of(context).size.height,
-                  height: 673,
+                  height: 500,
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -61,16 +46,27 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       SizedBox(height: 65),
                       Text(
-                        'LOGIN',
+                        'Recuperação de senha',
                         style: GoogleFonts.montserrat(
                             color: Color(0xFF4B0D07),
                             fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                            height: 0,
+                            letterSpacing: 0),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 60),
+                      Text(
+                        'Informe o seu e-mail de cadastro',
+                        style: GoogleFonts.montserrat(
+                            color: Color(0xFF4B0D07),
+                            fontSize: 18,
                             fontWeight: FontWeight.w400,
                             height: 0,
                             letterSpacing: 0),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 35),
+                      SizedBox(height: 20),
                       Container(
                         width: 350,
                         height: 50,
@@ -101,64 +97,6 @@ class _LoginPageState extends State<LoginPage> {
                               keyboardType: TextInputType.emailAddress,
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Container(
-                        width: 350,
-                        height: 50,
-                        margin: EdgeInsets.symmetric(horizontal: 40),
-                        decoration: ShapeDecoration(
-                          color: Color(0x4CEFDED8),
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              width: 1,
-                              // strokeAlign: StrokeAlign.center,
-                              color: Color(0x7F4B0D07),
-                            ),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                        child: TextFormField(
-                          controller: _passwordController,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 18,
-                            fontWeight: FontWeight.normal,
-                            decorationColor: Color(0xFF4B0D07),
-                            letterSpacing: 0),
-                            decoration: InputDecoration(
-                              hintText: 'Senha',
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                                  color: Color(0xFF4B0D07),
-                                ),
-                                onPressed: () => onPressedPassword()
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14), // Ajuste para alinhar verticalmente
-                            ),
-                            keyboardType: TextInputType.visiblePassword,
-                            obscureText: !_passwordVisible,
-                            ),
-                          ),
-                      SizedBox(height: 18),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 45),
-                        child: GestureDetector(
-                          onTap: () {
-                            context.go('/forgotPassword');
-                          },
-                          child: Text(
-                            'Esqueci minha senha',
-                            style: GoogleFonts.montserrat(
-                              color: Color(0xFFB98282),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              height: 0,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ),
                       SizedBox(height: 40),
                       Container(
                         width: 30,
@@ -171,26 +109,32 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         child: ElevatedButton(
-                          onPressed: () async {
-                            String email = _emailController.text;
-                            String password = _passwordController.text;
-
-                            if (email.isNotEmpty && password.isNotEmpty) {
-                              User? user = await AuthService.signInUser(email: email, password: password);
-
-                              if (user != null) {
-                                context.go('/homePage'); 
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Falha no login. Verifique suas credenciais.'),
+                          onPressed: (){
+                            String email = _emailController.text.trim();
+                            if (email.isNotEmpty) {
+                              _sendPasswordReset.resetPassword(email);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: Color(0xFFD8A9A9),
+                                  content: Text(
+                                    'Reset de senha enviado ao e-mail cadastrado.', 
+                                    style: TextStyle(
+                                      color:  Color(0xFF4B0D07)
+                                    )
                                   ),
-                                );
-                              }
+                                  action: SnackBarAction(
+                                    label: 'OK',
+                                    textColor: Color(0xFF4B0D07),
+                                    onPressed: () {
+                                      context.go('/login');
+                                    },
+                                  ),
+                                ),
+                              );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Por favor, preencha todos os campos.'),
+                                  content: Text('Por favor, preencha o campo de e-mail.'),
                                 ),
                               );
                             }
@@ -203,23 +147,23 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           child: Text(
-                            'CONTINUAR',
+                            'REDEFINIR SENHA',
                             style: GoogleFonts.montserrat(
                               color: Color(0xFF4B0D07),
-                              fontSize: 19,
+                              fontSize: 18,
                               fontWeight: FontWeight.w500,
                               height: 0,
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(height: 46),
+                      SizedBox(height: 30),
                       InkWell(
                         onTap: () {
-                          context.go('/createAccount');
+                          context.go('/login');
                         },
                         child: Text(
-                          'Não possui uma conta? Cadastre-se!',
+                          'Voltar ao Login',
                           style: GoogleFonts.montserrat(
                             color: Color(0xFF4B0D07),
                             fontSize: 17,

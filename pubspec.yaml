@@ -36,6 +36,8 @@ dependencies:
   google_fonts: ^5.1.0
 
   firebase_core: ^2.15.1 
+
+  cloud_firestore: ^4.14.0
   
   logger: ^2.0.2
 
@@ -52,6 +54,12 @@ dependencies:
   sliding_up_panel: ^2.0.0+1
 
   datetime_picker_formfield_new: ^2.1.0
+
+  flutter_datetime_picker_plus: ^2.1.0
+
+  customizable_counter: ^1.0.4
+
+  syncfusion_flutter_charts: ^24.2.7+1 
   
 
   # The following adds the Cupertino Icons font to your application.

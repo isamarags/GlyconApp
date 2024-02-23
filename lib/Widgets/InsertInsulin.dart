@@ -2,27 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:glycon_app/services/datePickerService.dart';
 import 'package:glycon_app/services/FirebaseFunctions.dart';
 
-class InsertBloodGlucose extends StatefulWidget {
-  final String userId;
-  final void Function() onDataRegistered;
+class InsertInsulin extends StatefulWidget {
   final VoidCallback closeOptionsPanel;
+  final String userId;
 
-  const InsertBloodGlucose({Key? key, required this.userId, required this.onDataRegistered, required this.closeOptionsPanel,}) : super(key: key);
+  const InsertInsulin({Key? key, required this.closeOptionsPanel, required this.userId}) : super(key: key);
   
 
   @override
-  _InsertBloodGlucoseState createState() => _InsertBloodGlucoseState();
+  _InsertInsulinState createState() => _InsertInsulinState();
 }
 
-class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
+class _InsertInsulinState extends State<InsertInsulin> {
   late DateTime selectedDate;
   late TimeOfDay selectedTime;
   bool beforeMealSelected = false;
   bool afterMealSelected = false;
-  TextEditingController glucoseLevelController = TextEditingController();
+  TextEditingController insulinLevelController = TextEditingController();
   TextEditingController dateTimeController = TextEditingController();
-  
-
 
   @override
   void initState() {
@@ -30,7 +27,6 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
     selectedDate = DateTime.now();
     selectedTime = TimeOfDay.now();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +56,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Glicemia',
+              'Insulina',
               style: TextStyle(
                 fontSize: 20,
                 color: Color(0xFF4B0D07),
@@ -68,7 +64,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
               ),
             ),
             SizedBox(height: 15),
-            Row(
+          Row(
               children: [
                 Expanded(
                     child: Stack(
@@ -131,7 +127,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Nível de glicose no sangue',
+                  'Insulina',
                   style: TextStyle(
                     fontSize: 16,
                     color: Color(0xFF4B0D07),
@@ -147,7 +143,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: TextField(
-                    controller: glucoseLevelController,
+                    controller: insulinLevelController,
                     keyboardType: TextInputType.number,
                     style: TextStyle(
                       color: Color(0xFF4B0D07),
@@ -158,7 +154,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
-                      suffixText: 'mg/dl',
+                      suffixText: '',
                       suffixStyle: TextStyle(
                         color: Color(0xFF4B0D07),
                         fontWeight: FontWeight.w500,
@@ -239,21 +235,19 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
             ElevatedButton(
               onPressed: () {
                 // Verifica se todos os campos obrigatórios foram preenchidos
-                if (glucoseLevelController.text.isNotEmpty &&
+                if (insulinLevelController.text.isNotEmpty &&
                     beforeMealSelected != afterMealSelected) {
                   // Lógica para salvar os dados
-                  dateTimeController.text = "${selectedDate.toLocal()} ${selectedTime.format(context)}";
 
-                   FirebaseFunctions.saveGlucoseToFirestore(
+                    FirebaseFunctions.saveInsulinDataToFirestore(
                     selectedDate: selectedDate,
-                    glucoseLevel: glucoseLevelController.text,
+                    insulinValue: insulinLevelController.text,
                     beforeMealSelected: beforeMealSelected,
                     afterMealSelected: afterMealSelected,
-                    userId: widget.userId, // Use o userId do widget pai
+                    // Adicione outros parâmetros conforme necessário
                   );
 
                   // Navigator.pop(context);
-                  widget.onDataRegistered();
                   widget.closeOptionsPanel();
                 } else {
                   // Mostra um pop-up informando que é obrigatório preencher todos os campos
@@ -268,7 +262,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
                           ),
                         ),
                         content: Text(
-                          'Para salvar o seu nível de glicose, por favor preencha todos os campos!',
+                          'Para salvar a sua insulina, por favor preencha todos os campos!',
                           style: TextStyle(
                             color: Color(0xFF4B0D07)
                           ),),

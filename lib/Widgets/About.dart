@@ -55,6 +55,14 @@ TextEditingController weightController = TextEditingController();
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            padding: EdgeInsets.only(left: 35),
+            onPressed: () => context.go('/'),
+            color: Color(0xFF4B0D07),
+          ),
+      ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         child: ListView(
@@ -64,8 +72,9 @@ TextEditingController weightController = TextEditingController();
               padding: EdgeInsets.symmetric(horizontal: 39),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
+                // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 80),
+                  SizedBox(height: 10),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -107,7 +116,7 @@ TextEditingController weightController = TextEditingController();
                             fontSize: 16,
                             fontWeight: FontWeight.w400),
                       ),
-                      SizedBox(width: 128),
+                      SizedBox(width: 100),
                       DropdownButton<String>(
                         value: selectedGender,
                         onChanged: (String? newGender) {

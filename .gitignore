@@ -43,3 +43,17 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 ios/Runner/GoogleService-Info.plist
+/ios/
+/macos/
+macos/Flutter/Flutter-Debug.xcconfig
+macos/Flutter/Flutter-Release.xcconfig
+macos/Flutter/GeneratedPluginRegistrant.swift
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
+ios/Runner.xcworkspace/contents.xcworkspacedata
+ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
+ios/Runner.xcodeproj/project.pbxproj
+ios/Runner/Info.plist
+ios/Flutter/Release.xcconfig
+ios/Flutter/Debug.xcconfig
+ios/Flutter/

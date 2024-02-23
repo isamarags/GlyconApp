@@ -78,10 +78,10 @@ class BuildHealthItem extends StatelessWidget {
               ],
             ),
             Spacer(),
-            IconButton(
-              icon: Icon(Icons.more_vert),
-              onPressed: () {},
-            ),
+            // IconButton(
+            //   icon: Icon(Icons.more_vert),
+            //   onPressed: () {},
+            // ),
           ],
         ),
       ),

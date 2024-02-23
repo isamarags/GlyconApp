@@ -21,7 +21,7 @@ class CustomBottomNavigationBarItem extends StatelessWidget {
     final color = isSelected ? Color(0xFFBA8383) : Color(0xFFEFDFD8);
 
     return GestureDetector(
-      onTap: onTap, // Use onTap diretamente
+      onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:glycon_app/Widgets/HeightSelectionDialog.dart';
 import 'package:glycon_app/Widgets/WeightPicker.dart';
+import 'package:glycon_app/Widgets/forgotPassword.dart';
+import 'package:glycon_app/pages/welcomePage.dart';
 import 'package:go_router/go_router.dart';
 // import 'package:glycon_app/assets/colors/colors.dart';
 import 'package:glycon_app/pages/createAccount_page.dart';
@@ -9,32 +11,50 @@ import 'package:glycon_app/Widgets/About.dart';
 import 'package:glycon_app/Widgets/Health.dart';
 import 'package:glycon_app/pages/home_page.dart';
 import 'package:glycon_app/pages/metasPage.dart';
-import 'package:glycon_app/pages/sharePage.dart';
 import 'package:glycon_app/pages/accountPage.dart';
 import 'Widgets/InsertBloodGlucose.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
-  runApp(const MyApp());
-
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  runApp(
+    MaterialApp(
+      home: MyApp(),
+    )
+  );
+
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
 }
 
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
     GoRoute(
-      path: '/login',
+      path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const LoginPage();
+        return WelcomePage();
       },
     ),
     GoRoute(
-      path: '/',
+      path: '/login',
+      builder: (BuildContext context, GoRouterState state) {
+        return LoginPage();
+      },
+    ),
+    GoRoute(
+      path: '/forgotPassword',
+      builder: (BuildContext context, GoRouterState state) {
+        return ForgotPassword();
+      },
+    ),
+    GoRoute(
+      path: '/createAccount',
       builder: (BuildContext context, GoRouterState state) {
         return const CreateAccountPage();
       },
@@ -54,7 +74,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/homePage',
       builder: (BuildContext context, GoRouterState state) {
-        return const LandingPage();
+        return LandingPage(glucoseValue: '', newGlucoseValue: '');
       },
     ),
     GoRoute(
@@ -80,23 +100,17 @@ final GoRouter _router = GoRouter(
     ),
 
     GoRoute(
-    path: '/homePage',
-    builder: (BuildContext context, GoRouterState state) {
-      return LandingPage();
-      },
-    ),
-    GoRoute(
       path: '/metas',
       builder: (BuildContext context, GoRouterState state) {
         return MetasPage();
       },
     ),
-    GoRoute(
-      path: '/sharePage',
-      builder: (BuildContext context, GoRouterState state) {
-        return SharePage();
-      },
-    ),
+    // GoRoute(
+    //   path: '/relatorios',
+    //   builder: (BuildContext context, GoRouterState state) {
+    //     return GlicemicIndexChart();
+    //   },
+    // ),
     GoRoute(
       path: '/accountPage',
       builder: (BuildContext context, GoRouterState state) {
@@ -106,7 +120,18 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/insertBloodGlucose',
       builder: (BuildContext context, GoRouterState state) {
-        return InsertBloodGlucose();
+        final userId = ModalRoute.of(context)!.settings.arguments as String;
+        return InsertBloodGlucose(
+          userId: userId,
+          onDataRegistered: () {
+            // Lógica para fechar o painel de opções
+            Navigator.pop(context);
+          }, 
+          closeOptionsPanel: () {
+            // Lógica para fechar o painel de opções
+            Navigator.pop(context);
+          },
+        );
       },
     ),
   ]

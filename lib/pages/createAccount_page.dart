@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 // import 'package:glycon_app/assets/colors/colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:logger/logger.dart';
+// import 'package:logger/logger.dart';
+import 'package:glycon_app/services/registerUser.dart'; // Importe o arquivo auth_service.dart
+
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({Key? key}) : super(key: key);
@@ -13,55 +14,17 @@ class CreateAccountPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
-  // final _formKey = GlobalKey<FormState>();
-  // final _emailController = TextEditingController();
-  // final _passwordController = TextEditingController();
-  // final _confirmPasswordController = TextEditingController();
-  // final _nameController = TextEditingController();
+  bool _passwordVisible = false;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _nameController = TextEditingController();
   // final _crmController = TextEditingController();
 
-  bool loading = false;
-
-  static Future<User?> registerUser({
-    required String name,
-    required String email,
-    required String password,
-  }) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    User? user;
-    final logger = Logger();
-
-    try {
-      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      user = userCredential.user;
-
-      await user!.updateDisplayName(name);
-      await user.reload();
-      final updatedUser = auth.currentUser;
-
-      if (updatedUser != null) {
-        logger.i(
-            'User registered: ${updatedUser.uid}, Name: ${updatedUser.displayName}');
-      } else {
-        logger.i('Failed to update user profile.');
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        logger.e('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        logger.e('The account already exists for that email.');
-      } else {
-        logger.e(e);
-      }
-
-      return user;
-    }
-
-    return null;
+  void onPressedPassword() {
+    setState(() {
+      _passwordVisible = !_passwordVisible;
+    });
   }
 
   @override
@@ -121,15 +84,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                        child: TextFormField(
-                          // controller: nomecompletoController,
-                          style: GoogleFonts.montserrat(
-                            color: Color(0xFF4B0D07),
-                            fontSize: 19,
-                            fontWeight: FontWeight.normal,
-                            decorationColor: Color(0xFF4B0D07),
-                            letterSpacing: 0
-                          ),
+                          child: TextFormField(
+                            controller: _nameController, // Adicione o controlador para o nome completo
+                            style: GoogleFonts.montserrat(
+                              color: Color(0xFF4B0D07),
+                              fontSize: 18,
+                              fontWeight: FontWeight.normal,
+                              decorationColor: Color(0xFF4B0D07),
+                              letterSpacing: 0
+                            ),
+                            textAlign: TextAlign.start, // Definir o alinhamento do texto
                           decoration: InputDecoration(
                             hintText: 'Nome completo',
                             border: InputBorder.none,
@@ -164,12 +128,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           ),
                         ),
                         child: TextFormField(
-                          // controller: emailController,
+                          controller: _emailController,
                           style: GoogleFonts.montserrat(
                               decorationColor: Color(0xFF4B0D07),
-                              fontSize: 19,
+                              fontSize: 18,
                               fontWeight: FontWeight.normal,
                               color: Color(0xFF4B0D07)),
+                          textAlign: TextAlign.start,
                           decoration: InputDecoration(
                               hintText: 'E-mail',
                               border: InputBorder.none,
@@ -195,18 +160,27 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           ),
                         ),
                         child: TextFormField(
-                          // controller: senhaController,
+                          controller: _passwordController,
                           style: GoogleFonts.montserrat(
-                              decorationColor: Color(0xFF4B0D07),
-                              fontSize: 20,
-                              fontWeight: FontWeight.normal,
-                              color: Color(0xFF4B0D07)),
+                            decorationColor: Color(0xFF4B0D07),
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                            color: Color(0xFF4B0D07)),
+                          textAlign: TextAlign.start, // Definir o alinhamento do texto
                           decoration: InputDecoration(
-                              hintText: 'Senha',
-                              border: InputBorder.none,
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 20)),
-                          obscureText: true,
+                            hintText: 'Senha',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                                color: Color(0xFF4B0D07),
+                              ),
+                              onPressed: () => onPressedPassword()
+                            ),
+                            border: InputBorder.none,
+                            contentPadding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 14)
+                          ),
+                          obscureText: !_passwordVisible,
                         ),
                       ),
                       SizedBox(height: 20),
@@ -226,35 +200,31 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           ),
                         ),
                         child: TextFormField(
-                          // controller: confirmarsenhaController,
+                          controller: _confirmPasswordController,
                           style: GoogleFonts.montserrat(
-                              decorationColor: Color(0xFF4B0D07),
-                              fontSize: 19,
-                              fontWeight: FontWeight.normal,
-                              color: Color(0xFF4B0D07)),
+                            decorationColor: Color(0xFF4B0D07),
+                            fontSize: 18,
+                            fontWeight: FontWeight.normal,
+                            color: Color(0xFF4B0D07)
+                          ),    
+                          textAlign: TextAlign.start, // Definir o alinhamento do texto
                           decoration: InputDecoration(
-                              hintText: 'Confirmar senha',
-                              border: InputBorder.none,
-                              contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 20)),
-                          obscureText: true,
-                        ),
-                      ),
-                      SizedBox(height: 23),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 45),
-                        child: Text(
-                          'Esqueci minha senha',
-                          style: GoogleFonts.montserrat(
-                            color: Color(0xFFB98282),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            height: 0,
+                            hintText: 'Confirmar senha',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                                  color: Color(0xFF4B0D07),
+                              ),
+                              onPressed: () => onPressedPassword()
+                            ),
+                            border: InputBorder.none,
+                            contentPadding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 14)
                           ),
-                          textAlign: TextAlign.right,
+                          obscureText: !_passwordVisible,
                         ),
                       ),
-                      SizedBox(height: 23),
+                      SizedBox(height: 45),
                       Container(
                         width: 30,
                         height: 53,
@@ -266,7 +236,15 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           ),
                         ),
                         child: ElevatedButton(
-                          onPressed: () => context.go('/about'),
+                          onPressed: ()async {
+                            await registerUser(
+                              context,
+                              _nameController,
+                              _emailController,
+                              _passwordController,
+                              _confirmPasswordController,
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFFD8A9A9),
                             shape: RoundedRectangleBorder(
@@ -335,18 +313,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           ),
         ),
       ),
+      
     );
   }
-
-  // void _submitForm() {
-  //   if (_formKey.currentState!.validate()) {
-  //     // Form is valid, proceed with your logic
-  //     // For example, you can extract the data from controllers like:
-  //     // String name = _nameController.text;
-  //     // String email = _emailController.text;
-  //     // String password = _passwordController.text;
-  //     // String confirmPassword = _confirmPasswordController.text;
-  //     // String crm = _crmController.text;
-  //   }
-  // }
 }
+
