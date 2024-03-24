@@ -14,12 +14,12 @@ class About extends StatefulWidget {
 }
 
 class _AboutState extends State<About> {
-TextEditingController weightController = TextEditingController();
+  TextEditingController weightController = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
 
-  List<String> gender = ["", "Masculino", "Feminino"];
-  String selectedGender = "";
+  List<String> gender = ["Selecione", "Masculino", "Feminino"];
+  String selectedGender = "Selecione";
 
   double selectedHeight = 0.0;
 
@@ -43,7 +43,7 @@ TextEditingController weightController = TextEditingController();
           weightController: weightController,
           onWeightChanged: (newWeight) {
             setState(() {
-              selectedWeight = newWeight; 
+              selectedWeight = newWeight;
             });
           },
         );
@@ -56,12 +56,12 @@ TextEditingController weightController = TextEditingController();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            padding: EdgeInsets.only(left: 35),
-            onPressed: () => context.go('/'),
-            color: Color(0xFF4B0D07),
-          ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          padding: EdgeInsets.only(left: 35),
+          onPressed: () => context.go('/'),
+          color: Color(0xFF4B0D07),
+        ),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,

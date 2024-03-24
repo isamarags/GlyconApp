@@ -12,8 +12,8 @@ class AuthService {
 
     try {
       UserCredential userCredential = await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+        email: 'isamaragsantos@gmail.com',
+        password: 'Oliver12',
       );
 
       user = userCredential.user;

@@ -6,14 +6,14 @@ import 'package:glycon_app/services/FirebaseFunctions.dart';
 
 class InsertPill extends StatefulWidget {
   final String userId;
-  // final void Function() onDataRegistered;
+  final void Function() onDataRegistered;
   final VoidCallback closeOptionsPanel;
 
   const InsertPill(
       {Key? key,
       required this.userId,
-      // required this.onDataRegistered,
-      required this.closeOptionsPanel})
+      required this.closeOptionsPanel,
+      required this.onDataRegistered})
       : super(key: key);
 
   @override
@@ -25,16 +25,18 @@ class _InsertPillState extends State<InsertPill> {
   late TimeOfDay selectedTime;
   bool beforeMealSelected = false;
   bool afterMealSelected = false;
-  TextEditingController glucoseLevelController = TextEditingController();
+  TextEditingController namePillController = TextEditingController();
   TextEditingController dateTimeController = TextEditingController();
   String namePill = ''; // Adicionado
   int quantityPill = 1; // Adicionado
+  String userId = '';
 
   @override
   void initState() {
     super.initState();
     selectedDate = DateTime.now();
     selectedTime = TimeOfDay.now();
+    userId = widget.userId;
   }
 
   @override
@@ -47,8 +49,6 @@ class _InsertPillState extends State<InsertPill> {
 
     final double verticalPadding = screenHeight * verticalPaddingPercent;
     final double horizontalPadding = screenWidth * horizontalPaddingPercent;
-    
-    double quantity = 1;
 
     return Container(
       decoration: BoxDecoration(
@@ -75,30 +75,33 @@ class _InsertPillState extends State<InsertPill> {
               ),
             ),
             SizedBox(height: 15),
-          Row(
+            Row(
               children: [
                 Expanded(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
                       TextFormField(
                         readOnly: true,
                         onTap: () async {
-                          final dateTime = await DatePickerService.selectDateTime(context, DateTime.now());
+                          final dateTime =
+                              await DatePickerService.selectDateTime(
+                                  context, DateTime.now());
 
                           if (dateTime != null) {
                             setState(() {
                               selectedDate = dateTime;
                               selectedTime = TimeOfDay.fromDateTime(dateTime);
-                              dateTimeController.text = "${selectedDate.day}/${selectedDate.month}/${selectedDate.year} ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}";
-
+                              dateTimeController.text =
+                                  "${selectedDate.day}/${selectedDate.month}/${selectedDate.year} ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}";
                             });
                           }
                         },
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Color(0xFFD8A9A9),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 10),
                           border: InputBorder.none,
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide.none,
@@ -117,9 +120,11 @@ class _InsertPillState extends State<InsertPill> {
                             fontSize: 16,
                             letterSpacing: 0.5,
                           ),
-                              alignLabelWithHint: true, // Adicione esta linha para centralizar o conteúdo
+                          alignLabelWithHint:
+                              true, // Adicione esta linha para centralizar o conteúdo
                         ),
-                        style: TextStyle(  // Adicione esta parte para definir o estilo
+                        style: TextStyle(
+                          // Adicione esta parte para definir o estilo
                           color: Color(0xFF4B0D07),
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
@@ -127,13 +132,12 @@ class _InsertPillState extends State<InsertPill> {
                         ),
                         controller: dateTimeController,
                       ),
-                      ],
-                    ),
+                    ],
+                  ),
                 ),
               ],
             ),
             SizedBox(height: 25),
-            
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -159,6 +163,7 @@ class _InsertPillState extends State<InsertPill> {
                         namePill = value;
                       });
                     },
+                    controller: namePillController,
                     keyboardType: TextInputType.number,
                     style: TextStyle(
                       color: Color(0xFF4B0D07),
@@ -219,26 +224,21 @@ class _InsertPillState extends State<InsertPill> {
                 ),
               ],
             ),
-
-
-
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
                 // Verifica se todos os campos obrigatórios foram preenchidos
-                if (glucoseLevelController.text.isNotEmpty &&
-                    beforeMealSelected != afterMealSelected) {
-
+                if (namePillController.text.isNotEmpty) {
                   FirebaseFunctions.savePillDataToFirestore(
                     selectedDate: selectedDate,
                     namePill: namePill,
-                    quantityPill: quantityPill
+                    quantityPill: quantityPill,
+                    userId: userId,
                   );
 
                   // Navigator.pop(context);
                   // widget.onDataRegistered();
                   widget.closeOptionsPanel();
-
                 } else {
                   // Mostra um pop-up informando que é obrigatório preencher todos os campos
                   showDialog(
@@ -247,15 +247,12 @@ class _InsertPillState extends State<InsertPill> {
                       return AlertDialog(
                         title: Text(
                           'Dados incorretos',
-                          style: TextStyle(
-                            color: Color(0xFF4B0D07)
-                          ),
+                          style: TextStyle(color: Color(0xFF4B0D07)),
                         ),
                         content: Text(
                           'Para salvar o medicamento, por favor preencha todos os campos!',
-                          style: TextStyle(
-                            color: Color(0xFF4B0D07)
-                          ),),
+                          style: TextStyle(color: Color(0xFF4B0D07)),
+                        ),
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
@@ -263,9 +260,7 @@ class _InsertPillState extends State<InsertPill> {
                             },
                             child: Text(
                               'OK',
-                              style: TextStyle(
-                                color: Color(0xFF4B0D07)
-                              ),
+                              style: TextStyle(color: Color(0xFF4B0D07)),
                             ),
                           ),
                         ],
@@ -273,7 +268,6 @@ class _InsertPillState extends State<InsertPill> {
                     },
                   );
                 }
-
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),

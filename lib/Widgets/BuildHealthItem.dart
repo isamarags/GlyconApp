@@ -50,34 +50,40 @@ class BuildHealthItem extends StatelessWidget {
               ),
             ),
             SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                      fontSize: 16,
+            Flexible(
+              // Usando Flexible para ajustar a altura do contêiner
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    softWrap: false, // Evita quebra de texto no título
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF4B0D07),
+                        fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                      height:
+                          5), // Ajuste de espaço entre o título e a descrição
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 12,
                       color: Color(0xFF4B0D07),
-                      fontWeight: FontWeight.w500),
-                ),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF4B0D07),
+                    ),
                   ),
-                ),
-                SizedBox(height: 15),
-                Text(
-                  dateTime,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                )
-              ],
+                  SizedBox(height: 15),
+                  Text(
+                    dateTime,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  )
+                ],
+              ),
             ),
-            Spacer(),
             // IconButton(
             //   icon: Icon(Icons.more_vert),
             //   onPressed: () {},

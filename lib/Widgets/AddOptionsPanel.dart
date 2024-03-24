@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:glycon_app/utils/sliding_up_functions.dart';
 import 'package:go_router/go_router.dart';
 
-
 class AddOptionsPanel extends StatefulWidget {
   final String userId;
   final void Function() onDataRegistered;
   String? newGlucoseValue;
   String? glucoseValue;
-  // String? newPillValue;
-  // String? pillValue;
+  String? newPillValue;
+  String? pillValue;
+  String? newFoodValue;
+  String? foodValue;
+  String? newInsulinValue;
+  String? insulinValue;
+
   final void Function() onClose;
   AddOptionsPanel(
       {Key? key,
@@ -19,9 +23,12 @@ class AddOptionsPanel extends StatefulWidget {
       required this.glucoseValue,
       required this.newGlucoseValue,
       required this.onClose,
-      // required this.newPillValue,
-      // required this.pillValue
-      })
+      this.newPillValue,
+      this.pillValue,
+      this.newFoodValue,
+      this.foodValue,
+      this.newInsulinValue,
+      this.insulinValue})
       : super(key: key);
 
   @override
@@ -42,22 +49,40 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
     final double horizontalPadding = screenWidth * horizontalPaddingPercent;
 
     void _updateGlucoseValue() {
+      // Atualiza o valor da glicose com o novo valor
       setState(() {
-        // Atualiza o valor da glicose com o novo valor
         widget.glucoseValue = widget.newGlucoseValue!;
       });
-
-      widget.onClose();
+      // Chama a função onDataRegistered para notificar a página inicial
+      widget.onDataRegistered();
     }
 
-    // void _updatePillValue() {
-    //   setState(() {
-    //     // Atualiza o valor da glicose com o novo valor
-    //     widget.pillValue = widget.newPillValue!;
-    //   });
+    void _updatePillValue() {
+      // Atualiza o valor do medicamento com o novo valor
+      setState(() {
+        widget.pillValue = widget.newPillValue!;
+      });
+      // Chama a função onDataRegistered para notificar a página inicial
+      widget.onDataRegistered();
+    }
 
-    //   widget.onClose();
-    // }
+    void _updateFoodValue() {
+      // Atualiza o valor do alimento com o novo valor
+      setState(() {
+        widget.foodValue = widget.newFoodValue!;
+      });
+      // Chama a função onDataRegistered para notificar a página inicial
+      widget.onDataRegistered();
+    }
+
+    void _updateInsulinValue() {
+      // Atualiza o valor da insulina com o novo valor
+      setState(() {
+        widget.insulinValue = widget.newInsulinValue!;
+      });
+      // Chama a função onDataRegistered para notificar a página inicial
+      widget.onDataRegistered();
+    }
 
     void _navigateToPage(int index) {
       final router = GoRouter.of(context);
@@ -70,7 +95,8 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
           router.go('/metas');
           break;
         case 2:
-          showSlidingUpBloodGlucose(context, widget.userId, () => _updateGlucoseValue());
+          showSlidingUpBloodGlucose(
+              context, widget.userId, () => _updateGlucoseValue());
           break;
         case 3:
           router.go('/sharePage');
@@ -80,7 +106,6 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
           break;
       }
     }
-
 
     void Function(int)? _onNavigationItemSelected(int index) {
       _navigateToPage(index);
@@ -92,12 +117,11 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
         }
 
         // Passa a função intermediária
-        showSlidingUpBloodGlucose(context, widget.userId, updateGlucoseValueWithoutArgument);
+        showSlidingUpBloodGlucose(
+            context, widget.userId, updateGlucoseValueWithoutArgument);
       }
       return null;
     }
-
-
 
     return Container(
       decoration: BoxDecoration(
@@ -125,11 +149,11 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
             ),
             SizedBox(height: 15),
             ElevatedButton(
-              onPressed: (){ 
-                showSlidingUpBloodGlucose(context, widget.userId, (){
+              onPressed: () {
+                showSlidingUpBloodGlucose(context, widget.userId, () {
                   _updateGlucoseValue();
                 });
-                },
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),
                 foregroundColor: Color(0xFF4B0D07),
@@ -148,7 +172,9 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-                showSlidingUpInsulin(context, widget.userId);
+                showSlidingUpInsulin(context, widget.userId, () {
+                  _updateInsulinValue();
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),
@@ -168,7 +194,9 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-                showSlidingUpPill(context, widget.userId);
+                showSlidingUpPill(context, widget.userId, () {
+                  _updatePillValue();
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),
@@ -188,7 +216,9 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-                showSlidingUpFood(context, widget.userId);
+                showSlidingUpFood(context, widget.userId, () {
+                  _updateFoodValue();
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),

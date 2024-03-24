@@ -1,30 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:glycon_app/services/FirebaseFunctions.dart';
 import 'package:glycon_app/services/datePickerService.dart';
-import 'package:customizable_counter/customizable_counter.dart';
+import 'package:glycon_app/Widgets/CustomCounter.dart' as Counter;
 
 class InsertFood extends StatefulWidget {
+  final String userId;
   final VoidCallback closeOptionsPanel;
+  final void Function() onDataRegistered;
 
-  const InsertFood({Key? key, required this.closeOptionsPanel}) : super(key: key);
-  
+  const InsertFood(
+      {Key? key,
+      required this.closeOptionsPanel,
+      required this.userId,
+      required this.onDataRegistered})
+      : super(key: key);
 
   @override
   _InsertFoodState createState() => _InsertFoodState();
 }
 
 class _InsertFoodState extends State<InsertFood> {
+  int quantityFood = 1;
+  String userId = '';
   late DateTime selectedDate;
   late TimeOfDay selectedTime;
-  bool beforeMealSelected = false;
-  bool afterMealSelected = false;
-  TextEditingController glucoseLevelController = TextEditingController();
+  TextEditingController foodController = TextEditingController();
+  TextEditingController quantityController = TextEditingController();
   TextEditingController dateTimeController = TextEditingController();
+  bool showQuantityField = true;
 
   @override
   void initState() {
     super.initState();
     selectedDate = DateTime.now();
     selectedTime = TimeOfDay.now();
+    userId = widget.userId;
   }
 
   @override
@@ -37,7 +47,7 @@ class _InsertFoodState extends State<InsertFood> {
 
     final double verticalPadding = screenHeight * verticalPaddingPercent;
     final double horizontalPadding = screenWidth * horizontalPaddingPercent;
-    
+
     double quantity = 1;
 
     return Container(
@@ -65,30 +75,33 @@ class _InsertFoodState extends State<InsertFood> {
               ),
             ),
             SizedBox(height: 15),
-          Row(
+            Row(
               children: [
                 Expanded(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
                       TextFormField(
                         readOnly: true,
                         onTap: () async {
-                          final dateTime = await DatePickerService.selectDateTime(context, DateTime.now());
+                          final dateTime =
+                              await DatePickerService.selectDateTime(
+                                  context, DateTime.now());
 
                           if (dateTime != null) {
                             setState(() {
                               selectedDate = dateTime;
                               selectedTime = TimeOfDay.fromDateTime(dateTime);
-                              dateTimeController.text = "${selectedDate.day}/${selectedDate.month}/${selectedDate.year} ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}";
-
+                              dateTimeController.text =
+                                  "${selectedDate.day}/${selectedDate.month}/${selectedDate.year} ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}";
                             });
                           }
                         },
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Color(0xFFD8A9A9),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 10),
                           border: InputBorder.none,
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide.none,
@@ -107,9 +120,11 @@ class _InsertFoodState extends State<InsertFood> {
                             fontSize: 16,
                             letterSpacing: 0.5,
                           ),
-                              alignLabelWithHint: true, // Adicione esta linha para centralizar o conteúdo
+                          alignLabelWithHint:
+                              true, // Adicione esta linha para centralizar o conteúdo
                         ),
-                        style: TextStyle(  // Adicione esta parte para definir o estilo
+                        style: TextStyle(
+                          // Adicione esta parte para definir o estilo
                           color: Color(0xFF4B0D07),
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
@@ -117,13 +132,12 @@ class _InsertFoodState extends State<InsertFood> {
                         ),
                         controller: dateTimeController,
                       ),
-                      ],
-                    ),
+                    ],
+                  ),
                 ),
               ],
             ),
             SizedBox(height: 25),
-            
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -144,7 +158,7 @@ class _InsertFoodState extends State<InsertFood> {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: TextField(
-                    controller: glucoseLevelController,
+                    controller: foodController,
                     keyboardType: TextInputType.number,
                     style: TextStyle(
                       color: Color(0xFF4B0D07),
@@ -175,81 +189,129 @@ class _InsertFoodState extends State<InsertFood> {
             ),
             SizedBox(height: 15),
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Quantidade',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF4B0D07),
-                    fontWeight: FontWeight.w500,
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      showQuantityField = true;
+                    });
+                  },
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor:
+                            showQuantityField ? Colors.green : Colors.grey,
+                        radius: 10,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        'Quantidade',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF4B0D07),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                    ],
                   ),
-                  textAlign: TextAlign.start,
                 ),
-                SizedBox(width: 20),  // Adjust the spacing between the text and the counter if needed
-                CustomizableCounter(
-                  borderColor: Colors.transparent,
-                  borderWidth: 0,
-                  showButtonText: true,
-                  borderRadius: 8.0,
-                  backgroundColor: Color(0xFFD8A9A9),
-                  textColor: Color(0xFF4B0D07),
-                  textSize: 16,
-                  count: quantity,
-                  step: 1,
-                  minCount: 1,
-                  maxCount: 10,
-                  incrementIcon: const Icon(
-                    Icons.add,
-                    color: Color(0xFF4B0D07),
-                  ),
-                  decrementIcon: const Icon(
-                    Icons.remove,
-                    color: Color(0xFF4B0D07),
-                  ),
-                  onCountChange: (count) {
-                    // Handle count change if needed
-                  },
-                  onIncrement: (count) {
+                SizedBox(width: 20),
+                GestureDetector(
+                  onTap: () {
                     setState(() {
-                      quantity = count;
+                      showQuantityField = false;
                     });
                   },
-                  onDecrement: (count) {
-                    setState(() {
-                      quantity = count;
-                    });
-                  },
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor:
+                            !showQuantityField ? Colors.green : Colors.grey,
+                        radius: 10,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        'Grama',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF4B0D07),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
             SizedBox(height: 15),
+            if (!showQuantityField)
+              SizedBox(
+                width: screenWidth,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 120.0),
+                  child: TextField(
+                    controller: quantityController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: "Gramas",
+                      hintStyle: TextStyle(
+                        color: Color(0xFF4B0D07).withOpacity(0.5),
+                        fontWeight: FontWeight.normal,
+                        fontSize: 16,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            if (showQuantityField)
+              SizedBox(
+                width: 120, // Defina a largura que você deseja
+                height: 50, // Defina a altura que você deseja
+                child: Counter.CustomCounter(
+                  quantity: quantityFood, // Passando a quantidade atual
+                  onIncrement: () {
+                    setState(() {
+                      quantityFood++;
+                    });
+                  },
+                  onDecrement: () {
+                    setState(() {
+                      if (quantityFood > 1) {
+                        quantityFood--;
+                      }
+                    });
+                  },
+                ),
+              ),
+            SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-                // Verifica se todos os campos obrigatórios foram preenchidos
-                if (glucoseLevelController.text.isNotEmpty &&
-                    beforeMealSelected != afterMealSelected) {
-                  // Lógica para salvar os dados
-                  // Navigator.pop(context);
-                  widget.closeOptionsPanel();
-                } else {
-                  // Mostra um pop-up informando que é obrigatório preencher todos os campos
+                if (foodController.text.isEmpty ||
+                    (showQuantityField &&
+                        quantityFood == num &&
+                        quantityController.text.isEmpty) ||
+                    (!showQuantityField && quantityController.text.isEmpty) ||
+                    dateTimeController.text.isEmpty) {
+                  // Mostra um pop-up informando que é obrigatório preencher pelo menos um dos campos
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text(
                           'Dados incorretos',
-                          style: TextStyle(
-                            color: Color(0xFF4B0D07)
-                          ),
+                          style: TextStyle(color: Color(0xFF4B0D07)),
                         ),
                         content: Text(
-                          'Para salvar o alimento, por favor preencha todos os campos!',
-                          style: TextStyle(
-                            color: Color(0xFF4B0D07)
-                          ),),
+                          'Por favor, preencha pelo menos um dos campos obrigatórios!',
+                          style: TextStyle(color: Color(0xFF4B0D07)),
+                        ),
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
@@ -257,17 +319,31 @@ class _InsertFoodState extends State<InsertFood> {
                             },
                             child: Text(
                               'OK',
-                              style: TextStyle(
-                                color: Color(0xFF4B0D07)
-                              ),
+                              style: TextStyle(color: Color(0xFF4B0D07)),
                             ),
                           ),
                         ],
                       );
                     },
                   );
-                }
+                } else {
+                  double quantity = showQuantityField
+                      ? quantityFood.toDouble()
+                      : double.tryParse(quantityController.text) ?? 0;
 
+                  FirebaseFunctions.saveFoodDataToFirestore(
+                    selectedDate: selectedDate,
+                    nameFood: foodController.text,
+                    quantityFood: quantity,
+                    typeFood: showQuantityField ? 'unidade' : 'grama',
+                    userId: userId,
+                    // Adicione outros parâmetros conforme necessário
+                  );
+                  // Lógica para salvar os dados
+                  // Navigator.pop(context);
+                  // widget.onDataRegistered();
+                  widget.closeOptionsPanel();
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),

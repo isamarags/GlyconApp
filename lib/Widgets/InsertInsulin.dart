@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:glycon_app/services/datePickerService.dart';
 import 'package:glycon_app/services/FirebaseFunctions.dart';
+import 'package:glycon_app/Widgets/CustomCounter.dart' as Counter;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:glycon_app/services/FirebaseFunctions.dart';
 
 class InsertInsulin extends StatefulWidget {
   final VoidCallback closeOptionsPanel;
   final String userId;
+  final void Function() onDataRegistered;
 
-  const InsertInsulin({Key? key, required this.closeOptionsPanel, required this.userId}) : super(key: key);
-  
+  const InsertInsulin({
+    Key? key,
+    required this.closeOptionsPanel,
+    required this.userId,
+    required this.onDataRegistered,
+  }) : super(key: key);
 
   @override
   _InsertInsulinState createState() => _InsertInsulinState();
@@ -20,12 +28,28 @@ class _InsertInsulinState extends State<InsertInsulin> {
   bool afterMealSelected = false;
   TextEditingController insulinLevelController = TextEditingController();
   TextEditingController dateTimeController = TextEditingController();
+  String userId = '';
+  late String selectedInsulinType = '';
+  late String selectedInsulin = '';
+  late List<String> insulinOptions = [];
 
   @override
   void initState() {
     super.initState();
     selectedDate = DateTime.now();
     selectedTime = TimeOfDay.now();
+    userId = widget.userId;
+    selectedInsulinType = 'Basal';
+    selectedInsulin = 'NPH';
+    FirebaseFunctions.fetchInsulinOptions().then((options) {
+      setState(() {
+        insulinOptions = options;
+        insulinOptions = options.toSet().toList(); // Remove duplicata
+      });
+    }).catchError((error) {
+      print('Erro ao buscar as opções de insulina: $error');
+      // Lidar com o erro conforme necessário
+    });
   }
 
   @override
@@ -64,30 +88,33 @@ class _InsertInsulinState extends State<InsertInsulin> {
               ),
             ),
             SizedBox(height: 15),
-          Row(
+            Row(
               children: [
                 Expanded(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
                       TextFormField(
                         readOnly: true,
                         onTap: () async {
-                          final dateTime = await DatePickerService.selectDateTime(context, DateTime.now());
+                          final dateTime =
+                              await DatePickerService.selectDateTime(
+                                  context, DateTime.now());
 
                           if (dateTime != null) {
                             setState(() {
                               selectedDate = dateTime;
                               selectedTime = TimeOfDay.fromDateTime(dateTime);
-                              dateTimeController.text = "${selectedDate.day}/${selectedDate.month}/${selectedDate.year} ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}";
-
+                              dateTimeController.text =
+                                  "${selectedDate.day}/${selectedDate.month}/${selectedDate.year} ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}";
                             });
                           }
                         },
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Color(0xFFD8A9A9),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 10),
                           border: InputBorder.none,
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide.none,
@@ -106,9 +133,11 @@ class _InsertInsulinState extends State<InsertInsulin> {
                             fontSize: 16,
                             letterSpacing: 0.5,
                           ),
-                              alignLabelWithHint: true, // Adicione esta linha para centralizar o conteúdo
+                          alignLabelWithHint:
+                              true, // Adicione esta linha para centralizar o conteúdo
                         ),
-                        style: TextStyle(  // Adicione esta parte para definir o estilo
+                        style: TextStyle(
+                          // Adicione esta parte para definir o estilo
                           color: Color(0xFF4B0D07),
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
@@ -116,18 +145,83 @@ class _InsertInsulinState extends State<InsertInsulin> {
                         ),
                         controller: dateTimeController,
                       ),
-                      ],
-                    ),
+                    ],
+                  ),
                 ),
               ],
             ),
             SizedBox(height: 25),
-            
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Text(
+                //   'Tipo de Insulina',
+                //   style: TextStyle(
+                //     fontSize: 16,
+                //     color: Color(0xFF4B0D07),
+                //     fontWeight: FontWeight.w500,
+                //   ),
+                //   textAlign: TextAlign.start,
+                // ),
+                // SizedBox(height: 25),
+                
+                
+                Text(
+                  'Insulina',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF4B0D07),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.start,
+                ),
+                SizedBox(height: 5),
+                DropdownButtonFormField<String>(
+                  value: selectedInsulin.isNotEmpty
+                      ? selectedInsulin
+                      : insulinOptions.isNotEmpty
+                          ? insulinOptions[0]
+                          : null,
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedInsulin = newValue!;
+                    });
+                  },
+                  items:
+                      insulinOptions.map<DropdownMenuItem<String>>((insulin) {
+                    return DropdownMenuItem<String>(
+                      value: insulin,
+                      child: Text(
+                        insulin,
+                        style: TextStyle(
+                          color: Color(0xFF4B0D07),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Color(0xFFD8A9A9),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintText: 'Selecionar insulina',
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 25),
+
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Insulina',
+                  'Dosagem de Insulina (UI)',
                   style: TextStyle(
                     fontSize: 16,
                     color: Color(0xFF4B0D07),
@@ -143,7 +237,12 @@ class _InsertInsulinState extends State<InsertInsulin> {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: TextField(
-                    controller: insulinLevelController,
+                    onChanged: (value) {
+                      setState(() {
+
+                      });
+                    },
+                    // controller: ,
                     keyboardType: TextInputType.number,
                     style: TextStyle(
                       color: Color(0xFF4B0D07),
@@ -172,12 +271,12 @@ class _InsertInsulinState extends State<InsertInsulin> {
                 ),
               ],
             ),
-            SizedBox(height: 15),
+            SizedBox(height: 25),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: screenWidth * 0.38, // Ajuste o tamanho dos botões
+                  width: screenWidth * 0.38,
                   child: ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -189,42 +288,50 @@ class _InsertInsulinState extends State<InsertInsulin> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 8), // Ajuste o padding vertical
-                      backgroundColor: beforeMealSelected ?
-                          Color(0xFF4B0D07) : Color(0xFFD8A9A9),
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      backgroundColor: beforeMealSelected
+                          ? Color(0xFF4B0D07)
+                          : Color(0xFFD8A9A9),
                     ),
-                    child: Text('Antes da refeição',
+                    child: Text(
+                      'Antes da refeição',
                       style: TextStyle(
-                        fontSize: 14, // Ajuste o tamanho do texto
-                        color: beforeMealSelected ?
-                            Color(0xFFD8A9A9) : Color(0xFF4B0D07),
+                        fontSize: 14,
+                        color: beforeMealSelected
+                            ? Color(0xFFD8A9A9)
+                            : Color(0xFF4B0D07),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(width: 10), // Ajuste o espaço entre os botões para evitar o overflow
                 SizedBox(
-                  width: screenWidth * 0.38, // Ajuste o tamanho dos botões
+                  width: 10,
+                ),
+                SizedBox(
+                  width: screenWidth * 0.38,
                   child: ElevatedButton(
                     onPressed: () {
                       setState(() {
                         afterMealSelected = !afterMealSelected;
-                        
-                        if(afterMealSelected) {
-                            beforeMealSelected = false;
+
+                        if (afterMealSelected) {
+                          beforeMealSelected = false;
                         }
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 8), // Ajuste o padding vertical
-                      backgroundColor: afterMealSelected ?
-                          Color(0xFF4B0D07) : Color(0xFFD8A9A9),
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      backgroundColor: afterMealSelected
+                          ? Color(0xFF4B0D07)
+                          : Color(0xFFD8A9A9),
                     ),
-                    child: Text('Depois da refeição',
+                    child: Text(
+                      'Depois da refeição',
                       style: TextStyle(
-                        fontSize: 14, // Ajuste o tamanho do texto
-                        color: afterMealSelected ?
-                            Color(0xFFD8A9A9) : Color(0xFF4B0D07),
+                        fontSize: 14,
+                        color: afterMealSelected
+                            ? Color(0xFFD8A9A9)
+                            : Color(0xFF4B0D07),
                       ),
                     ),
                   ),
@@ -234,38 +341,30 @@ class _InsertInsulinState extends State<InsertInsulin> {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-                // Verifica se todos os campos obrigatórios foram preenchidos
                 if (insulinLevelController.text.isNotEmpty &&
                     beforeMealSelected != afterMealSelected) {
-                  // Lógica para salvar os dados
-
-                    FirebaseFunctions.saveInsulinDataToFirestore(
+                  FirebaseFunctions.saveInsulinDataToFirestore(
                     selectedDate: selectedDate,
                     insulinValue: insulinLevelController.text,
                     beforeMealSelected: beforeMealSelected,
                     afterMealSelected: afterMealSelected,
-                    // Adicione outros parâmetros conforme necessário
+                    insulinType: selectedInsulinType,
+                    userId: userId,
                   );
-
-                  // Navigator.pop(context);
                   widget.closeOptionsPanel();
                 } else {
-                  // Mostra um pop-up informando que é obrigatório preencher todos os campos
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text(
                           'Dados incorretos',
-                          style: TextStyle(
-                            color: Color(0xFF4B0D07)
-                          ),
+                          style: TextStyle(color: Color(0xFF4B0D07)),
                         ),
                         content: Text(
                           'Para salvar a sua insulina, por favor preencha todos os campos!',
-                          style: TextStyle(
-                            color: Color(0xFF4B0D07)
-                          ),),
+                          style: TextStyle(color: Color(0xFF4B0D07)),
+                        ),
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
@@ -273,9 +372,7 @@ class _InsertInsulinState extends State<InsertInsulin> {
                             },
                             child: Text(
                               'OK',
-                              style: TextStyle(
-                                color: Color(0xFF4B0D07)
-                              ),
+                              style: TextStyle(color: Color(0xFF4B0D07)),
                             ),
                           ),
                         ],
@@ -283,7 +380,6 @@ class _InsertInsulinState extends State<InsertInsulin> {
                     },
                   );
                 }
-
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),

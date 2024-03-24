@@ -9,8 +9,8 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
-linter:
-  rules:
+linter: 
+  rules: 
     prefer_const_constructors: false
     ignore_for_file: prefer_const_constructors
     

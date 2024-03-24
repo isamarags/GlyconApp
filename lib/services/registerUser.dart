@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:glycon_app/services/auth_service.dart'; // Importe o arquivo auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'package:glycon_app/services/FirebaseFunctions.dart' as FirebaseFunctions;
+import 'package:glycon_app/services/FirebaseFunctions.dart'
+    as FirebaseFunctions;
 
 Future<void> registerUser(
   BuildContext context,
@@ -30,7 +31,8 @@ Future<void> registerUser(
       );
 
       if (newUser != null) {
-        await FirebaseFunctions.FirebaseFunctions.saveUserNameToFirestore(newUser.uid, name);
+        await FirebaseFunctions.FirebaseFunctions.saveUserNameToFirestore(
+            newUser.uid, name);
 
         await FirebaseFunctions.FirebaseFunctions.saveGlucoseToFirestore(
           selectedDate: DateTime.now(),
@@ -40,6 +42,29 @@ Future<void> registerUser(
           userId: newUser.uid, // Passe o ID do usuário
         );
 
+        await FirebaseFunctions.FirebaseFunctions.saveInsulinDataToFirestore(
+          selectedDate: DateTime.now(),
+          insulinValue: 'Insulina não adicionado.', // Coloque o valor da insulina aqui
+          beforeMealSelected: false, // Substitua pelo valor correto
+          afterMealSelected: false, // Substitua pelo valor correto
+          insulinType: 'Tipo de insulina não adicionado.', // Passe o ID do usuário
+          userId: newUser.uid, // Passe o ID do usuário
+        );
+
+        await FirebaseFunctions.FirebaseFunctions.savePillDataToFirestore(
+          selectedDate: DateTime.now(),
+          namePill: 'Medicamento não adicionado.', // Coloque o nome do remédio aqui
+          quantityPill: 0, // Coloque a dose do remédio aqui
+          userId: newUser.uid, // Passe o ID do usuário
+        );
+
+        await FirebaseFunctions.FirebaseFunctions.saveFoodDataToFirestore(
+          selectedDate: DateTime.now(),
+          nameFood: 'Alimento não adicionado', // Coloque o valor da glicose aqui
+          quantityFood: 0, // Substitua pelo valor correto
+          userId: newUser.uid, // Substitua pelo valor correto
+          typeFood: '', // Passe o ID do usuário
+        );
 
         context.go('/about');
       } else {
@@ -49,16 +74,12 @@ Future<void> registerUser(
             return AlertDialog(
               title: Text(
                 'Erro no cadastro',
-                style: TextStyle(
-                  color: Color(0xFF4B0D07)
-                ),
-               ),
+                style: TextStyle(color: Color(0xFF4B0D07)),
+              ),
               content: Text(
                 'Não foi possível realizar o cadastro. Verifique seus caracteres.',
-                style: TextStyle(
-                  color: Color(0xFF4B0D07)
-                  ),
-                ),
+                style: TextStyle(color: Color(0xFF4B0D07)),
+              ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -66,10 +87,8 @@ Future<void> registerUser(
                   },
                   child: Text(
                     'OK',
-                    style: TextStyle(
-                      color: Color(0xFF4B0D07)
-                      ),
-                    ),
+                    style: TextStyle(color: Color(0xFF4B0D07)),
+                  ),
                 ),
               ],
               backgroundColor: Color(0xFFD8A9A9),
@@ -84,15 +103,11 @@ Future<void> registerUser(
           return AlertDialog(
             title: Text(
               'Erro',
-              style: TextStyle(
-                color: Color(0xFF4B0D07)
-              ),
+              style: TextStyle(color: Color(0xFF4B0D07)),
             ),
             content: Text(
-              'As senhas não coincidem.', 
-              style: TextStyle(
-                color: Color(0xFF4B0D07)
-              ),
+              'As senhas não coincidem.',
+              style: TextStyle(color: Color(0xFF4B0D07)),
             ),
             actions: <Widget>[
               TextButton(
@@ -101,9 +116,7 @@ Future<void> registerUser(
                 },
                 child: Text(
                   'OK',
-                  style: TextStyle(
-                    color: Color(0xFF4B0D07)
-                  ),
+                  style: TextStyle(color: Color(0xFF4B0D07)),
                 ),
               ),
             ],
@@ -119,15 +132,11 @@ Future<void> registerUser(
         return AlertDialog(
           title: Text(
             'Erro',
-            style: TextStyle(
-              color: Color(0xFF4B0D07)
-            ),
+            style: TextStyle(color: Color(0xFF4B0D07)),
           ),
           content: Text(
             'Por favor, preencha todos os campos.',
-            style: TextStyle(
-              color: Color(0xFF4B0D07)
-            ),
+            style: TextStyle(color: Color(0xFF4B0D07)),
           ),
           actions: <Widget>[
             TextButton(
@@ -135,14 +144,12 @@ Future<void> registerUser(
                 Navigator.of(context).pop();
               },
               child: Text(
-                'OK', 
-                style: TextStyle(
-                  color: Color(0xFF4B0D07)
-                ),
+                'OK',
+                style: TextStyle(color: Color(0xFF4B0D07)),
               ),
             ),
           ],
-          backgroundColor: Color(0xFFD8A9A9), 
+          backgroundColor: Color(0xFFD8A9A9),
         );
       },
     );

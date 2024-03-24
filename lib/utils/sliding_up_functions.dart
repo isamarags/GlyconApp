@@ -8,7 +8,8 @@ void closeAllModals(BuildContext context) {
   Navigator.of(context).popUntil((route) => route.isFirst);
 }
 
-void showSlidingUpBloodGlucose(BuildContext context, String userId, VoidCallback onDataRegisteredCallback) {
+void showSlidingUpBloodGlucose(BuildContext context, String userId,
+    VoidCallback onDataRegisteredCallback) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -17,20 +18,19 @@ void showSlidingUpBloodGlucose(BuildContext context, String userId, VoidCallback
       return InsertBloodGlucose(
         userId: userId,
         onDataRegistered: () {
-          // Lógica a ser executada após os dados serem registrados
-          // Por exemplo, atualizar a interface do usuário
-          onDataRegisteredCallback(); // Chama a função de retorno de chamada
+          onDataRegisteredCallback();
         },
         closeOptionsPanel: () {
-          Navigator.pop(context); // Fecha o sliding up panel do InsertBloodGlucose
+          Navigator.pop(
+              context); // Fecha o sliding up panel do InsertBloodGlucose
         },
       );
     },
   );
 }
 
-
-void showSlidingUpInsulin(BuildContext context, String userId) {
+void showSlidingUpInsulin(BuildContext context, String userId,
+    VoidCallback onDataRegisteredCallback) {
   closeAllModals(context);
   showModalBottomSheet(
     context: context,
@@ -39,17 +39,20 @@ void showSlidingUpInsulin(BuildContext context, String userId) {
     isDismissible: true,
     builder: (context) {
       return InsertInsulin(
+        onDataRegistered: () {
+          onDataRegisteredCallback();
+        },
         closeOptionsPanel: () {
           Navigator.pop(context);
         },
         userId: userId,
-        
       );
     },
   );
 }
 
-void showSlidingUpPill(BuildContext context, String userId) {
+void showSlidingUpPill(BuildContext context, String userId,
+    VoidCallback onDataRegisteredCallback) {
   closeAllModals(context);
   showModalBottomSheet(
     context: context,
@@ -59,20 +62,20 @@ void showSlidingUpPill(BuildContext context, String userId) {
     builder: (context) {
       return InsertPill(
         userId: userId,
-        // onDataRegistered: () {
-        //   // Lógica a ser executada após os dados serem registrados
-        //   // Por exemplo, atualizar a interface do usuário
-        //   onDataRegisteredCallback(); // Chama a função de retorno de chamada
-        // },
+        onDataRegistered: () {
+          onDataRegisteredCallback();
+        },
         closeOptionsPanel: () {
-          Navigator.pop(context); // Fecha o sliding up panel do InsertBloodGlucose
+          Navigator.pop(
+              context); // Fecha o sliding up panel do InsertBloodGlucose
         },
       );
     },
   );
 }
 
-void showSlidingUpFood(BuildContext context, String userId) {
+void showSlidingUpFood(BuildContext context, String userId,
+    VoidCallback onDataRegisteredCallback) {
   closeAllModals(context);
   showModalBottomSheet(
     context: context,
@@ -81,10 +84,13 @@ void showSlidingUpFood(BuildContext context, String userId) {
     isDismissible: true,
     builder: (context) {
       return InsertFood(
+        onDataRegistered: () {
+          onDataRegisteredCallback();
+        },
         closeOptionsPanel: () {
           Navigator.pop(context);
         },
-        // userId: userId,
+        userId: userId,
       );
     },
   );

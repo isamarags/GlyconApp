@@ -16,8 +16,8 @@ class Health extends StatefulWidget {
 class _HealthState extends State<Health> {
   DateTime selectedDate = DateTime.now();
 
-  List<String> typeDiabetes = ["", "Tipo 1", "Tipo 2", "Gestacional"];
-  String typeDiabetesSelected = "";
+  List<String> typeDiabetes = ["Selecione", "Tipo 1", "Tipo 2", "Gestacional"];
+  String typeDiabetesSelected = "Selecione";
 
   List<String> optionsTreatment = [
     "Medicamento",
@@ -32,12 +32,12 @@ class _HealthState extends State<Health> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            padding: EdgeInsets.only(left: 35),
-            onPressed: () => context.go('/about'),
-            color: Color(0xFF4B0D07),
-          ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          padding: EdgeInsets.only(left: 35),
+          onPressed: () => context.go('/about'),
+          color: Color(0xFF4B0D07),
+        ),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
