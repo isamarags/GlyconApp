@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:glycon_app/Widgets/InsertBloodGlucose.dart';
-import 'package:glycon_app/utils/sliding_up_functions.dart';
-import 'package:go_router/go_router.dart';
+import 'package:glycon_app/services/sliding_up_functions.dart';
+// import 'package:go_router/go_router.dart';
 
 class AddOptionsPanel extends StatefulWidget {
   final String userId;
@@ -84,44 +84,44 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
       widget.onDataRegistered();
     }
 
-    void _navigateToPage(int index) {
-      final router = GoRouter.of(context);
+    // void _navigateToPage(int index) {
+    //   final router = GoRouter.of(context);
 
-      switch (index) {
-        case 0:
-          router.go('/homePage');
-          break;
-        case 1:
-          router.go('/metas');
-          break;
-        case 2:
-          showSlidingUpBloodGlucose(
-              context, widget.userId, () => _updateGlucoseValue());
-          break;
-        case 3:
-          router.go('/sharePage');
-          break;
-        case 4:
-          router.go('/accountPage');
-          break;
-      }
-    }
+    //   switch (index) {
+    //     case 0:
+    //       router.go('/homePage');
+    //       break;
+    //     case 1:
+    //       router.go('/metas');
+    //       break;
+    //     case 2:
+    //       showSlidingUpBloodGlucose(
+    //           context, widget.userId, () => _updateGlucoseValue());
+    //       break;
+    //     case 3:
+    //       router.go('/sharePage');
+    //       break;
+    //     case 4:
+    //       router.go('/accountPage');
+    //       break;
+    //   }
+    // }
 
-    void Function(int)? _onNavigationItemSelected(int index) {
-      _navigateToPage(index);
+    // void Function(int)? _onNavigationItemSelected(int index) {
+    //   _navigateToPage(index);
 
-      if (index == 0) {
-        // Função intermediária sem argumentos
-        void updateGlucoseValueWithoutArgument() {
-          _updateGlucoseValue();
-        }
+    //   if (index == 0) {
+    //     // Função intermediária sem argumentos
+    //     void updateGlucoseValueWithoutArgument() {
+    //       _updateGlucoseValue();
+    //     }
 
-        // Passa a função intermediária
-        showSlidingUpBloodGlucose(
-            context, widget.userId, updateGlucoseValueWithoutArgument);
-      }
-      return null;
-    }
+    //     // Passa a função intermediária
+    //     showSlidingUpBloodGlucose(
+    //         context, widget.userId, updateGlucoseValueWithoutArgument);
+    //   }
+    //   return null;
+    // }
 
     return Container(
       decoration: BoxDecoration(

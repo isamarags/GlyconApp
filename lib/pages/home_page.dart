@@ -6,9 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:glycon_app/services/FirebaseFunctions.dart' as firebaseService;
+import 'package:flutter_initicon/flutter_initicon.dart';
+import 'package:random_color/random_color.dart';
+
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 class LandingPage extends StatefulWidget {
-
   final String? newGlucoseValue;
   String? glucoseValue;
   final String? newPillValue;
@@ -41,6 +45,7 @@ class _LandingPageState extends State<LandingPage> {
   String _userId = '';
   bool _firstTimeUser = true;
   FirebaseAuth auth = FirebaseAuth.instance;
+  RandomColor _randomColor = RandomColor();
 
   void _setGreeting() {
     DateTime now = DateTime.now();
@@ -126,12 +131,11 @@ class _LandingPageState extends State<LandingPage> {
         await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
     Map<String, dynamic>? glucoseData = await firebaseService.FirebaseFunctions
         .getLatestGlucoseDataFromFirestore(userId);
-        String glucoseLevelString = glucoseData['glucoseLevel'];
-        int glucoseLevel = int.tryParse(glucoseLevelString) ?? 0;
-        setState(() {
-          widget.glucoseValue = glucoseLevel.toString();
-        });
-
+    String glucoseLevelString = glucoseData['glucoseLevel'];
+    int glucoseLevel = int.tryParse(glucoseLevelString) ?? 0;
+    setState(() {
+      widget.glucoseValue = glucoseLevel.toString();
+    });
   }
 
   void _navigateToPage(int index) {
@@ -176,6 +180,44 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
+  String getInitials(String fullName) {
+    List<String> names = fullName.split(' ');
+    String initials = '';
+    int numWords =
+        2; // Altere para o número de palavras cujas iniciais você deseja pegar
+
+    if (names.length >= numWords) {
+      for (int i = 0; i < numWords; i++) {
+        initials += names[i][0].toUpperCase();
+      }
+    } else {
+      for (int i = 0; i < names.length; i++) {
+        initials += names[i][0].toUpperCase();
+      }
+    }
+
+    return initials;
+  }
+
+  Color getColorForUserId(String userId) {
+    // Converte o ID do usuário em uma sequência de bytes
+    List<int> bytes = utf8.encode(userId);
+
+    // Calcula o hash MD5 dos bytes do ID do usuário
+    Digest md5Hash = md5.convert(bytes);
+
+    // Converte o hash em uma string hexadecimal
+    String hexHash = md5Hash.toString();
+
+    // Extrai os valores hexadecimais para R, G e B
+    int r = int.parse(hexHash.substring(0, 2), radix: 16);
+    int g = int.parse(hexHash.substring(2, 4), radix: 16);
+    int b = int.parse(hexHash.substring(4, 6), radix: 16);
+
+    // Retorna a cor correspondente
+    return Color.fromRGBO(r, g, b, 1.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -183,6 +225,9 @@ class _LandingPageState extends State<LandingPage> {
       builder: (context, snapshot) {
         String? userName = snapshot.data;
         _userName = userName ?? '';
+        String initials = getInitials(_userName);
+        String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+        Color userBackgroundColor = getColorForUserId(userId);
         return Scaffold(
           backgroundColor: Colors.white,
           body: RefreshIndicator(
@@ -206,10 +251,10 @@ class _LandingPageState extends State<LandingPage> {
                         children: [
                           Row(
                             children: [
-                              CircleAvatar(
-                                backgroundImage:
-                                    AssetImage('lib/assets/images/avatar.png'),
-                                radius: 30,
+                              Initicon(
+                                text: initials,
+                                backgroundColor: userBackgroundColor,
+                                size: 50,
                               ),
                               SizedBox(width: 15),
                               Column(
@@ -370,10 +415,17 @@ class _LandingPageState extends State<LandingPage> {
                                 String formattedDateTime =
                                     '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
 
+
+                                int pillQuantity = data['quantityPill'] ?? 0;
+                                String pillName= data['namePill'];
+
+                                String description = 
+                                    '$pillName \n${pillQuantity.toString()} unidades';
+
                                 return BuildHealthItem(
                                   imagePath: 'lib/assets/images/medication.png',
                                   title: 'Medicamento',
-                                  description: data['namePill'],
+                                  description: description,
                                   backgroundColor: Colors.blue,
                                   dateTime: formattedDateTime,
                                 );
@@ -384,42 +436,43 @@ class _LandingPageState extends State<LandingPage> {
                             },
                           ),
                           FutureBuilder<DocumentSnapshot>(
-                            future: firebaseService.FirebaseFunctions.getLastInsulinDataFromFirestore(_userId),
-                            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
+                            future: firebaseService.FirebaseFunctions
+                                .getLastInsulinDataFromFirestore(_userId),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<DocumentSnapshot> snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
                                 return CircularProgressIndicator();
                               } else if (snapshot.hasError) {
                                 return Text('Erro: ${snapshot.error}');
-                              } else if (!snapshot.hasData || snapshot.data == null || snapshot.data!.data() == null) {
-                                // Retorna BuildHealthItem vazio se não houver dados
-                                return BuildHealthItem(
-                                  title: 'Insulina',
-                                  imagePath: 'lib/assets/images/insulin.png',
-                                  description: '',
-                                  backgroundColor: Colors.green,
-                                  dateTime: '',
-                                );
-                              } else {
-                                Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                              } else if (snapshot.hasData) {
+                                Map<String, dynamic> data = snapshot.data!
+                                    .data() as Map<String, dynamic>;
+                                String insulinType =
+                                    data['insulinType'] ?? 'Desconhecido';
+                                String insulinValue =
+                                    data['insulinValue'] ?? 'Desconhecido';
 
-                                Timestamp timestamp = data['selectedDate'] ?? Timestamp.now();
+                                Timestamp timestamp =
+                                    data['selectedDate'] ?? Timestamp.now();
                                 DateTime dateTime = timestamp.toDate();
 
-                                String formattedDateTime = '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+                                String formattedDateTime =
+                                    '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
 
                                 return BuildHealthItem(
                                   imagePath: 'lib/assets/images/insulin.png',
                                   title: 'Insulina',
-                                  description: data['insulinValue'],
+                                  description: 'Tipo: $insulinType\nDosagem: $insulinValue UI',
                                   backgroundColor: Colors.green,
                                   dateTime: formattedDateTime,
                                 );
+                              } else {
+                                return Text(
+                                    'Nenhum dado de insulina encontrado');
                               }
                             },
                           ),
-
-
-
                           FutureBuilder<DocumentSnapshot>(
                             future: firebaseService.FirebaseFunctions
                                 .getLastFoodDataFromFirestore(_userId),
@@ -446,8 +499,8 @@ class _LandingPageState extends State<LandingPage> {
                                 String foodType = data['typeFood'];
 
                                 String description = foodType == 'grama'
-                                    ? '$foodDescription - ${foodQuantity.toString()} gramas'
-                                    : '$foodDescription - ${foodQuantity.toString()} unidades';
+                                    ? 'Alimento: $foodDescription \nPeso: ${foodQuantity.toString()} gramas'
+                                    : 'Alimento: $foodDescription \nQuantidade: ${foodQuantity.toString()} unidades';
 
                                 return BuildHealthItem(
                                   imagePath: 'lib/assets/images/food.png',

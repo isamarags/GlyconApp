@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glycon_app/Widgets/HeightSelectionDialog.dart';
-import 'package:glycon_app/Widgets/HomePageChart.dart';
+import 'package:glycon_app/pages/HomePageChart.dart';
 import 'package:glycon_app/Widgets/WeightPicker.dart';
 import 'package:glycon_app/Widgets/forgotPassword.dart';
 import 'package:glycon_app/pages/welcomePage.dart';
@@ -89,12 +89,12 @@ final GoRouter _router = GoRouter(routes: <RouteBase>[
     path: '/weight',
     builder: (BuildContext context, GoRouterState state) {
       String selectedWeight =
-          ''; // Crie uma variável para armazenar o peso selecionado
+          ''; 
 
       return WeightPicker(
         selectedWeight:
-            selectedWeight, // Passe o valor selecionado como inicial
-        weightController: null, // Preencha com o controlador adequado
+            selectedWeight, 
+        weightController: null,
         onWeightChanged: (newWeight) {
           return newWeight;
         },
@@ -104,7 +104,14 @@ final GoRouter _router = GoRouter(routes: <RouteBase>[
   GoRoute(
     path: '/height',
     builder: (BuildContext context, GoRouterState state) {
-      return const HeightSelectionDialog();
+      double? selectedHeight; 
+
+      return HeightSelectionDialog(
+        onHeightChanged: (newHeight) {
+          selectedHeight =
+              newHeight;
+        },
+      );
     },
   ),
 
@@ -148,11 +155,9 @@ final GoRouter _router = GoRouter(routes: <RouteBase>[
       return InsertBloodGlucose(
         userId: userId,
         onDataRegistered: () {
-          // Lógica para fechar o painel de opções
           Navigator.pop(context);
         },
         closeOptionsPanel: () {
-          // Lógica para fechar o painel de opções
           Navigator.pop(context);
         },
       );

@@ -51,6 +51,8 @@ class _WelcomePageState extends State<WelcomePage> {
                         child: ElevatedButton(
                           onPressed: (){
                             context.go('/createAccount');
+                            // context.go('/health');
+
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFFD8A9A9),

@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-// import 'package:multi_select_flutter/multi_select_flutter.dart';
-
-// import 'package:flutter_svg/flutter_svg.dart';
-// import 'package:flutter_date_pickers/flutter_date_pickers.dart';
+import 'package:glycon_app/services/getUserData.dart';
+import 'package:glycon_app/Services/FirebaseFunctions.dart';
 
 class Health extends StatefulWidget {
-  const Health({super.key});
+  const Health({Key? key}) : super(key: key);
 
   @override
   State<Health> createState() => _HealthState();
 }
 
 class _HealthState extends State<Health> {
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedFundoscopiaDate = DateTime.now();
+  DateTime selectedRACDate = DateTime.now(); 
 
-  List<String> typeDiabetes = ["Selecione", "Tipo 1", "Tipo 2", "Gestacional"];
-  String typeDiabetesSelected = "Selecione";
+  List<String> typeDiabetes = ["Selecionar", "Tipo 1", "Tipo 2", "Gestacional"];
+  String typeDiabetesSelected = "Selecionar";
 
   List<String> optionsTreatment = [
     "Medicamento",
@@ -100,9 +99,13 @@ class _HealthState extends State<Health> {
                   ),
                   child: DropdownButton<String>(
                     value: typeDiabetesSelected,
-                    onChanged: (String? newTypeDiabetes) {
+                    onChanged: (String? newTypeDiabetes) async {
+                      String userId =
+                          await FirebaseFunctions.getUserIdFromFirestore();
                       setState(() {
                         typeDiabetesSelected = newTypeDiabetes!;
+                        GetUserData.saveUserDiabetesTypeToFirestore(
+                            userId, newTypeDiabetes);
                       });
                     },
                     items: typeDiabetes.map((String tipo) {
@@ -129,70 +132,69 @@ class _HealthState extends State<Health> {
               thickness: 1,
             ),
             SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
-                ),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Text(
-                      'Último exame Fundoscopia',
-                      style: GoogleFonts.montserrat(
-                        color: Color(0xFFB98282),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Text(
-                      '(Exame fundo de olho)',
-                      style: GoogleFonts.montserrat(
-                        color: Color(0xFFB98282),
-                        fontSize: 12,
-                      ),
-                    ),
                     Container(
-                      child: GestureDetector(
-                        onTap: () {
-                          showDatePicker(
-                            context: context,
-                            initialDate: selectedDate,
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
-                          ).then((date) {
-                            if (date != null && date != selectedDate) {
-                              setState(() {
-                                selectedDate = date;
-                              });
-                            }
-                          });
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
-                              style: GoogleFonts.montserrat(
-                                color: Color(0xFF4B0D07),
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      child:
+                          Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
+                    ),
+                    SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Último exame Fundoscopia',
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFFB98282),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        Text(
+                          '(Exame fundo de olho)',
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFFB98282),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                Spacer(),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: selectedFundoscopiaDate,
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    ).then((date) {
+                      if (date != null && date != selectedFundoscopiaDate) {
+                        setState(() {
+                          selectedFundoscopiaDate = date;
+                        });
+                      }
+                    });
+                  },
+                  child: Text(
+                    '${selectedFundoscopiaDate.day}/${selectedFundoscopiaDate.month}/${selectedFundoscopiaDate.year}',
+                    style: GoogleFonts.montserrat(
+                      color: Color(0xFF4B0D07),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
               ],
             ),
             SizedBox(height: 30),
@@ -201,74 +203,83 @@ class _HealthState extends State<Health> {
               thickness: 1,
             ),
             SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
-                ),
-                SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Text(
-                      'Último exame RAC)',
-                      style: GoogleFonts.montserrat(
-                        color: Color(0xFFB98282),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Text(
-                      '(Relação Albumina / Creatinina)',
-                      style: GoogleFonts.montserrat(
-                        color: Color(0xFFB98282),
-                        fontSize: 12,
-                      ),
-                    ),
                     Container(
-                      child: GestureDetector(
-                        onTap: () {
-                          showDatePicker(
-                            context: context,
-                            initialDate: selectedDate,
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
-                          ).then((date) {
-                            if (date != null && date != selectedDate) {
-                              setState(() {
-                                selectedDate = date;
-                              });
-                            }
-                          });
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
-                              style: GoogleFonts.montserrat(
-                                color: Color(0xFF4B0D07),
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      child:
+                          Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
+                    ),
+                    SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Último exame RAC',
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFFB98282),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        Text(
+                          '(Relação Albumina/Creatinina)',
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFFB98282),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: selectedRACDate,
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime.now(),
+                    ).then((date) {
+                      if (date != null && date != selectedRACDate) {
+                        setState(() {
+                          selectedRACDate = date;
+                        });
+                      }
+                    });
+                  },
+                  child: Text(
+                    '${selectedRACDate.day}/${selectedRACDate.month}/${selectedRACDate.year}',
+                    style: GoogleFonts.montserrat(
+                      color: Color(0xFF4B0D07),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ],
             ),
             SizedBox(height: 90),
             ElevatedButton(
-              onPressed: () => context.go('/homePage'),
+              onPressed: () async {
+                String userId =
+                    await FirebaseFunctions.getUserIdFromFirestore();
+
+                GetUserData.saveUserFundoscopiaDateToFirestore(
+                    userId, selectedFundoscopiaDate);
+                GetUserData.saveUserRACDateToFirestore(userId, selectedRACDate);
+
+                context.go('/homePage');
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),
                 shape: RoundedRectangleBorder(

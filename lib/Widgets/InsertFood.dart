@@ -48,7 +48,7 @@ class _InsertFoodState extends State<InsertFood> {
     final double verticalPadding = screenHeight * verticalPaddingPercent;
     final double horizontalPadding = screenWidth * horizontalPaddingPercent;
 
-    double quantity = 1;
+    // double quantity = 1;
 
     return Container(
       decoration: BoxDecoration(

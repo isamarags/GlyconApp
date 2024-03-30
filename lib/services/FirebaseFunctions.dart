@@ -207,6 +207,30 @@ class FirebaseFunctions {
     }
   }
 
+  // static Future<void> saveUserWeightToFirestore(
+  //     String userId, double weight) async {
+  //   try {
+  //     await FirebaseFirestore.instance.collection('users').doc(userId).set({
+  //       'weight': weight,
+  //     });
+  //   } catch (e) {
+  //     print('Erro ao salvar o peso do usuário no Firestore: $e');
+  //   }
+  // }
+
+  // static Future<void> saveUserHeightToFirestore(
+  //   String userId,
+  //   double height,
+  // ) async {
+  //   try {
+  //     await FirebaseFirestore.instance.collection('users').doc(userId).set({
+  //       'height': height,
+  //     });
+  //   } catch (e) {
+  //     print('Erro ao salvar a altura do usuário no Firestore: $e');
+  //   }
+  // }
+
   // get user name
   static Future<String> getUserNameFromFirestore() async {
     try {
@@ -273,7 +297,8 @@ class FirebaseFunctions {
     }
   }
 
-  static Future<DocumentSnapshot> getLastInsulinDataFromFirestore(String userId) async {
+  static Future<DocumentSnapshot> getLastInsulinDataFromFirestore(
+      String userId) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     // Busque o último documento adicionado à subcoleção 'insulina' do usuário
@@ -294,8 +319,7 @@ class FirebaseFunctions {
     }
   }
 
-
-static Future<DocumentSnapshot> getLastFoodDataFromFirestore(
+  static Future<DocumentSnapshot> getLastFoodDataFromFirestore(
       String userId) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -314,25 +338,121 @@ static Future<DocumentSnapshot> getLastFoodDataFromFirestore(
     if (querySnapshot.docs.isNotEmpty) {
       QueryDocumentSnapshot queryDocumentSnapshot = querySnapshot.docs.first;
       return firestore.doc(queryDocumentSnapshot.reference.path).get();
-    } 
+    }
 
     throw Exception('Nenhum documento encontrado');
   }
 
   //retornar os valores de insulina
-    static Future<List<String>> fetchInsulinOptions() async {
+  static Future<List<String>> fetchInsulinOptions() async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('insulinOptions')
-          .get();
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('insulinOptions').get();
 
-      List<String> insulinOptions = querySnapshot.docs
-          .map((doc) => doc['name'] as String)
-          .toList();
+      List<String> insulinOptions =
+          querySnapshot.docs.map((doc) => doc['name'] as String).toList();
 
       return insulinOptions;
     } catch (e) {
       throw Exception('Erro ao buscar as opções de insulina: $e');
     }
   }
+
+  static Future<List<Map<String, dynamic>>> getGlucoseDataWithinRange(
+      String userId, DateTime startDate, DateTime endDate) async {
+    try {
+      // Obter a referência da coleção de dados de glicose do usuário
+      CollectionReference glucoseCollection = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('glicose');
+
+      // Consultar os documentos dentro do intervalo de datas fornecido
+      QuerySnapshot querySnapshot = await glucoseCollection
+          .where('selectedDate', isGreaterThanOrEqualTo: startDate)
+          .where('selectedDate', isLessThanOrEqualTo: endDate)
+          .get();
+
+      // Converter os documentos em uma lista de mapas
+      List<Map<String, dynamic>> glucoseData = [];
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        glucoseData.add(data);
+      });
+
+      return glucoseData;
+    } catch (e) {
+      print('Erro ao obter dados de glicose no intervalo de datas: $e');
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getGlucoseDataForDate(
+      String userId, DateTime selectedDate) async {
+    try {
+      // Normalizar selectedDate para a meia-noite do mesmo dia
+      selectedDate =
+          DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+
+      // Obter a referência da coleção de dados de glicose do usuário
+      CollectionReference glucoseCollection = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('glicose');
+
+      // Consultar os documentos para a data selecionada
+      QuerySnapshot querySnapshot = await glucoseCollection
+          .where('selectedDate', isEqualTo: selectedDate)
+          .get();
+
+      // Converter os documentos em uma lista de mapas
+      List<Map<String, dynamic>> glucoseData = [];
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        glucoseData.add(data);
+      });
+
+      return glucoseData;
+    } catch (e) {
+      print('Erro ao obter dados de glicose para a data: $e');
+      return [];
+    }
+  }
+
+  // dados de glicose dos ultimos 30 dias
+  static Future<List<Map<String, dynamic>>> getGlucoseDataForLast30Days(
+      String userId) async {
+    try {
+      // Obter a data de hoje
+      DateTime today = DateTime.now();
+
+      // Obter a data de 30 dias atrás
+      DateTime thirtyDaysAgo = today.subtract(Duration(days: 30));
+
+      // Obter a referência da coleção de dados de glicose do usuário
+      CollectionReference glucoseCollection = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('glicose');
+
+      // Consultar os documentos dentro do intervalo de datas fornecido
+      QuerySnapshot querySnapshot = await glucoseCollection
+          .where('selectedDate', isGreaterThanOrEqualTo: thirtyDaysAgo)
+          .where('selectedDate', isLessThanOrEqualTo: today)
+          .get();
+
+      // Converter os documentos em uma lista de mapas
+      List<Map<String, dynamic>> glucoseData = [];
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        glucoseData.add(data);
+      });
+
+      return glucoseData;
+    } catch (e) {
+      print('Erro ao obter dados de glicose dos últimos 30 dias: $e');
+      return [];
+    }
+  }
+
 }

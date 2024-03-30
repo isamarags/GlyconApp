@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:glycon_app/services/datePickerService.dart';
 import 'package:glycon_app/services/FirebaseFunctions.dart';
-import 'package:glycon_app/Widgets/CustomCounter.dart' as Counter;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:glycon_app/services/FirebaseFunctions.dart';
+// import 'package:glycon_app/Widgets/CustomCounter.dart' as Counter;
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:glycon_app/services/FirebaseFunctions.dart';
 
 class InsertInsulin extends StatefulWidget {
   final VoidCallback closeOptionsPanel;
@@ -40,11 +40,14 @@ class _InsertInsulinState extends State<InsertInsulin> {
     selectedTime = TimeOfDay.now();
     userId = widget.userId;
     selectedInsulinType = 'Basal';
-    selectedInsulin = 'NPH';
+    selectedInsulin = 'Selecionar'; // Definindo como vazio inicialmente
     FirebaseFunctions.fetchInsulinOptions().then((options) {
       setState(() {
-        insulinOptions = options;
-        insulinOptions = options.toSet().toList(); // Remove duplicata
+        insulinOptions = options.toSet().toList(); // Remover duplicatas
+        if (insulinOptions.isNotEmpty) {
+          selectedInsulin =
+              insulinOptions[0]; // Definir o primeiro valor como selecionado
+        }
       });
     }).catchError((error) {
       print('Erro ao buscar as opções de insulina: $error');
@@ -164,8 +167,7 @@ class _InsertInsulinState extends State<InsertInsulin> {
                 //   textAlign: TextAlign.start,
                 // ),
                 // SizedBox(height: 25),
-                
-                
+
                 Text(
                   'Insulina',
                   style: TextStyle(
@@ -185,6 +187,8 @@ class _InsertInsulinState extends State<InsertInsulin> {
                   onChanged: (newValue) {
                     setState(() {
                       selectedInsulin = newValue!;
+
+                      selectedInsulinType = newValue; 
                     });
                   },
                   items:
@@ -216,7 +220,6 @@ class _InsertInsulinState extends State<InsertInsulin> {
               ],
             ),
             SizedBox(height: 25),
-
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -237,11 +240,7 @@ class _InsertInsulinState extends State<InsertInsulin> {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: TextField(
-                    onChanged: (value) {
-                      setState(() {
-
-                      });
-                    },
+                    controller: insulinLevelController,
                     // controller: ,
                     keyboardType: TextInputType.number,
                     style: TextStyle(
@@ -342,7 +341,8 @@ class _InsertInsulinState extends State<InsertInsulin> {
             ElevatedButton(
               onPressed: () {
                 if (insulinLevelController.text.isNotEmpty &&
-                    beforeMealSelected != afterMealSelected) {
+                    beforeMealSelected != afterMealSelected &&
+                    selectedInsulin.isNotEmpty) {
                   FirebaseFunctions.saveInsulinDataToFirestore(
                     selectedDate: selectedDate,
                     insulinValue: insulinLevelController.text,

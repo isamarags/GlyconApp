@@ -3,9 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glycon_app/Widgets/HeightSelectionDialog.dart';
 import 'package:glycon_app/Widgets/WeightPicker.dart';
+import 'package:glycon_app/Services/FirebaseFunctions.dart';
+import 'package:glycon_app/services/getUserData.dart';
 
 class About extends StatefulWidget {
-  final String? selectedWeight;
+  final double? selectedWeight;
 
   const About({Key? key, this.selectedWeight}) : super(key: key);
 
@@ -18,18 +20,31 @@ class _AboutState extends State<About> {
 
   DateTime selectedDate = DateTime.now();
 
-  List<String> gender = ["Selecione", "Masculino", "Feminino"];
-  String selectedGender = "Selecione";
+  List<String> gender = ["Selecionar", "Masculino", "Feminino"];
+  String selectedGender = "Selecionar";
 
-  double selectedHeight = 0.0;
+  double? selectedHeight;
 
-  String selectedWeight = '';
+  double? selectedWeight;
+
+  @override
+  void initState() {
+    selectedWeight = null;
+    selectedHeight = null;
+    super.initState();
+  }
 
   void openHeightSelectionDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return HeightSelectionDialog();
+        return HeightSelectionDialog(
+          onHeightChanged: (novaAltura) {
+            setState(() {
+              selectedHeight = novaAltura;
+            });
+          },
+        );
       },
     );
   }
@@ -39,11 +54,11 @@ class _AboutState extends State<About> {
       context: context,
       builder: (BuildContext context) {
         return WeightPicker(
-          selectedWeight: selectedWeight,
+          selectedWeight: selectedWeight.toString(),
           weightController: weightController,
           onWeightChanged: (newWeight) {
             setState(() {
-              selectedWeight = newWeight;
+              selectedWeight = double.parse(newWeight);
             });
           },
         );
@@ -226,7 +241,9 @@ class _AboutState extends State<About> {
                       GestureDetector(
                         onTap: () => openWeightPicker(context),
                         child: Text(
-                          'Selecionar',
+                          selectedWeight == null
+                              ? 'Selecionar'
+                              : selectedWeight.toString(),
                           style: GoogleFonts.montserrat(
                             color: Color(0xFF4B0D07),
                             fontSize: 16,
@@ -266,7 +283,10 @@ class _AboutState extends State<About> {
                       GestureDetector(
                         onTap: () => openHeightSelectionDialog(context),
                         child: Text(
-                          'Selecionar',
+                          selectedHeight == null
+                              ? 'Selecionar'
+                              : (selectedHeight! / 100).toStringAsFixed(
+                                  2), // Formatando para centímetros
                           style: GoogleFonts.montserrat(
                             color: Color(0xFF4B0D07),
                             fontSize: 16,
@@ -278,7 +298,37 @@ class _AboutState extends State<About> {
                   ),
                   SizedBox(height: 100),
                   ElevatedButton(
-                    onPressed: () => context.go('/health'),
+                    onPressed: () async {
+                      String userId =
+                          await FirebaseFunctions.getUserIdFromFirestore();
+
+                      if (selectedGender != "Selecionar" &&
+                          selectedWeight != 0.0 &&
+                          selectedHeight != 0.0 &&
+                          selectedDate != DateTime.now()) {
+                        await GetUserData.saveUserGenderToFirestore(
+                            userId, selectedGender);
+                        await GetUserData.saveUserWeightToFirestore(
+                            userId, selectedWeight ?? 0.0);
+                        await GetUserData.saveUserHeightToFirestore(
+                            userId, selectedHeight ?? 0.0);
+
+                        await GetUserData.saveUserBirthDateToFirestore(
+                            userId, selectedDate);
+
+                        context.go('/health');
+                      } else {
+                        // Mostra uma mensagem de erro ou alerta ao usuário
+                        // indicando que é necessário selecionar um gênero antes de continuar
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Por favor, selecione um gênero antes de continuar'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFD8A9A9),
                       shape: RoundedRectangleBorder(

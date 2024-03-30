@@ -8,12 +8,12 @@ class WeightPicker extends StatefulWidget {
   final String? selectedWeight;
   final Function(String) onWeightChanged;
 
-  const WeightPicker({
-    Key? key, 
-    this.weightController, 
-    this.selectedWeight,
-    required this.onWeightChanged
-    }) : super(key: key);
+  const WeightPicker(
+      {Key? key,
+      this.weightController,
+      this.selectedWeight,
+      required this.onWeightChanged})
+      : super(key: key);
 
   @override
   State<WeightPicker> createState() => _WeightPickerState();
@@ -68,8 +68,8 @@ class _WeightPickerState extends State<WeightPicker> {
                 max: max,
                 onChange: (newWeight) {
                   setState(() {
-                    selectedWeight = newWeight;
-                    widget.onWeightChanged(newWeight);
+                    selectedWeight = newWeight.toString();
+                    widget.onWeightChanged(newWeight.toString());
                   });
                 },
                 dialColor: Color(0xFF4B0D07),

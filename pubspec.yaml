@@ -81,7 +81,15 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   firebase_auth: ^4.9.0
-  flutter_svg: ^2.0.8
+  flutter_svg: ^2.0.10+1
+  syncfusion_flutter_pdf: ^24.2.9
+  excel: ^4.0.2
+  provider: ^6.1.2
+  open_file: ^3.3.2
+  data_table_2: ^2.5.12
+  avatar_glow: ^3.0.1
+  flutter_initicon: ^3.0.0+1
+  random_color: ^1.0.6-nullsafety
 
 
 dev_dependencies:

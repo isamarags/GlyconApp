@@ -3,7 +3,10 @@ import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
 
 class HeightSelectionDialog extends StatefulWidget {
-const HeightSelectionDialog({Key? key}) : super(key: key);
+  final Function(double) onHeightChanged;
+
+  const HeightSelectionDialog({Key? key, required this.onHeightChanged})
+      : super(key: key);
 
   @override
   State<HeightSelectionDialog> createState() => _HeightSelectionDialogState();
@@ -24,12 +27,11 @@ class _HeightSelectionDialogState extends State<HeightSelectionDialog> {
         ),
         AlertDialog(
           title: Text(
-            'Selecionar altura', 
+            'Selecionar altura',
             style: GoogleFonts.montserrat(
               color: Color(0xFF4B0D07),
               fontSize: 20,
               fontWeight: FontWeight.w500,
-              
             ),
             textAlign: TextAlign.center,
           ),
@@ -38,7 +40,7 @@ class _HeightSelectionDialogState extends State<HeightSelectionDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Escolha sua altura em centímetros:',            
+                'Escolha sua altura em centímetros:',
                 style: GoogleFonts.montserrat(
                   color: Color(0xFF4B0D07),
                   fontSize: 14,
@@ -57,6 +59,7 @@ class _HeightSelectionDialogState extends State<HeightSelectionDialog> {
                   setState(() {
                     selectedHeight = newHeight;
                   });
+                  widget.onHeightChanged(newHeight);
                 },
               ),
               Text(
