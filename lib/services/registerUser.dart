@@ -36,34 +36,33 @@ Future<void> registerUser(
 
         await FirebaseFunctions.FirebaseFunctions.saveGlucoseToFirestore(
           selectedDate: DateTime.now(),
-          glucoseLevel: '0', // Coloque o valor da glicose aqui
-          beforeMealSelected: false, // Substitua pelo valor correto
-          afterMealSelected: false, // Substitua pelo valor correto
-          userId: newUser.uid, // Passe o ID do usuário
+          glucoseLevel: '0', 
+          mealTime: 'Tipo de refeição não adicionado.', 
+          userId: newUser.uid, 
         );
 
         await FirebaseFunctions.FirebaseFunctions.saveInsulinDataToFirestore(
           selectedDate: DateTime.now(),
-          insulinValue: 'Insulina não adicionado.', // Coloque o valor da insulina aqui
-          beforeMealSelected: false, // Substitua pelo valor correto
-          afterMealSelected: false, // Substitua pelo valor correto
-          insulinType: 'Tipo de insulina não adicionado.', // Passe o ID do usuário
-          userId: newUser.uid, // Passe o ID do usuário
+          insulinValue: 'Insulina não adicionado.', 
+          beforeMealSelected: false,
+          afterMealSelected: false, 
+          insulinType: 'Tipo de insulina não adicionado.',
+          userId: newUser.uid, 
         );
 
         await FirebaseFunctions.FirebaseFunctions.savePillDataToFirestore(
           selectedDate: DateTime.now(),
-          namePill: 'Medicamento não adicionado.', // Coloque o nome do remédio aqui
-          quantityPill: 0, // Coloque a dose do remédio aqui
-          userId: newUser.uid, // Passe o ID do usuário
+          namePill: 'Medicamento não adicionado.',
+          quantityPill: 0,
+          userId: newUser.uid, 
         );
 
         await FirebaseFunctions.FirebaseFunctions.saveFoodDataToFirestore(
           selectedDate: DateTime.now(),
-          nameFood: 'Alimento não adicionado', // Coloque o valor da glicose aqui
-          quantityFood: 0, // Substitua pelo valor correto
-          userId: newUser.uid, // Substitua pelo valor correto
-          typeFood: '', // Passe o ID do usuário
+          nameFood: 'Alimento não adicionado',
+          quantityFood: 0, 
+          userId: newUser.uid, 
+          typeFood: '', 
         );
 
         context.go('/about');

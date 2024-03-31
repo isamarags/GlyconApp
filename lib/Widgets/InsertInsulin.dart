@@ -224,7 +224,7 @@ class _InsertInsulinState extends State<InsertInsulin> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Dosagem de Insulina (UI)',
+                  'Unidades de insulina (UI)',
                   style: TextStyle(
                     fontSize: 16,
                     color: Color(0xFF4B0D07),

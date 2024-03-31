@@ -11,8 +11,9 @@ class FirebaseFunctions {
   static Future<void> saveGlucoseToFirestore({
     required DateTime selectedDate,
     required String glucoseLevel,
-    required bool beforeMealSelected,
-    required bool afterMealSelected,
+    // required bool beforeMealSelected,
+    // required bool afterMealSelected,
+    required String mealTime,
     required String userId,
   }) async {
     try {
@@ -23,8 +24,9 @@ class FirebaseFunctions {
           .add({
         'selectedDate': selectedDate,
         'glucoseLevel': glucoseLevel,
-        'beforeMealSelected': beforeMealSelected,
-        'afterMealSelected': afterMealSelected,
+        // 'beforeMealSelected': beforeMealSelected,
+        // 'afterMealSelected': afterMealSelected,
+        'mealTime': mealTime,
       });
     } catch (e) {
       print('Erro ao salvar dados de glicose no Firestore: $e');

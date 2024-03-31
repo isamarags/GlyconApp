@@ -525,15 +525,19 @@ class _HomePageChartState extends State<HomePageChart> {
             context: context,
             data: _generateTableData(glucoseDataList),
             headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-            cellStyle: pw.TextStyle(),
+            cellStyle: pw.TextStyle(fontSize: 10),
             border: pw.TableBorder.all(),
             cellAlignment: pw.Alignment.center,
             columnWidths: {
-              0: pw.FixedColumnWidth(150),
-              1: pw.FixedColumnWidth(100),
-              2: pw.FixedColumnWidth(150),
-              3: pw.FixedColumnWidth(200),
-              4: pw.FixedColumnWidth(200),
+              0: pw.FixedColumnWidth(105),
+              1: pw.FixedColumnWidth(75),
+              2: pw.FixedColumnWidth(110),
+              3: pw.FixedColumnWidth(110),
+              4: pw.FixedColumnWidth(110),
+              5: pw.FixedColumnWidth(110),
+              6: pw.FixedColumnWidth(110),
+              7: pw.FixedColumnWidth(110),
+              8: pw.FixedColumnWidth(110),
             },
           ),
         ],
@@ -559,49 +563,65 @@ class _HomePageChartState extends State<HomePageChart> {
 
   List<List<dynamic>> _generateTableData(
       List<Map<String, dynamic>> glucoseDataList) {
+        
     List<List<dynamic>> tableData = [
+
       [
         'Data',
         'Hora',
-        'Valor Glicemia',
-        'Período da Refeição',
-        'Comparação com a Meta'
-      ].map((str) => str.toUpperCase()).toList()
+        'Antes do café',
+        '2h após o café',
+        'Antes do almoço',
+        '2h após o almoço',
+        'Antes do jantar',
+        '2h após o jantar',
+      ].map((str) => str).toList()
     ];
 
     for (Map<String, dynamic> data in glucoseDataList) {
       DateTime myDateTime = DateTime.fromMillisecondsSinceEpoch(
           data['selectedDate'].seconds * 1000);
       String formattedDate = DateFormat('dd/MM/yyyy').format(myDateTime);
+      String formattedTime = DateFormat('HH:mm').format(myDateTime);
 
-      String mealPeriod = data['beforeMealSelected']
-          ? 'Antes da Refeição'
-          : 'Depois da Refeição';
+      // Inicializar as colunas de refeição com um valor padrão vazio
+      List<String> mealColumns = List.filled(6, '');
 
+      // Mapear os valores de refeição para as colunas correspondentes
+      switch (data['mealTime']) {
+        case 'Antes do café da manhã':
+          mealColumns[0] = data['glucoseLevel'].toString();
+          break;
+        case '2 horas após o café da manhã':
+          mealColumns[1] = data['glucoseLevel'].toString();
+          break;
+        case 'Antes do almoço':
+          mealColumns[2] = data['glucoseLevel'].toString();
+          break;
+        case '2 horas após o almoço':
+          mealColumns[3] = data['glucoseLevel'].toString();
+          break;
+        case 'Antes do jantar':
+          mealColumns[4] = data['glucoseLevel'].toString();
+          break;
+        case '2 horas após o jantar':
+          mealColumns[5] = data['glucoseLevel'].toString();
+          break;
+        default:
+          break;
+      }
+
+      // Adicionar os valores da data, hora e das colunas de refeição à linha da tabela
       tableData.add([
         formattedDate,
-        DateFormat('HH:mm').format(myDateTime),
-        data['glucoseLevel'].toString(),
-        mealPeriod,
-        _compareWithTargets(double.parse(data['glucoseLevel'])),
+        formattedTime,
+        ...mealColumns,
       ]);
     }
 
-    return tableData;
-  }
+    
 
-  String _compareWithTargets(double glucoseLevel) {
-    if (glucoseLevel < 70) {
-      return 'Abaixo da meta';
-    } else if (glucoseLevel >= 70 && glucoseLevel <= 130) {
-      return 'Dentro da meta';
-    } else if (glucoseLevel > 160 && glucoseLevel <= 180) {
-      return 'Dentro da meta';
-    } else if (glucoseLevel > 180) {
-      return 'Acima da meta';
-    } else {
-      return '';
-    }
+    return tableData;
   }
 }
 
