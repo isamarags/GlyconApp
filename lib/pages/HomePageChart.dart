@@ -229,6 +229,18 @@ class _HomePageChartState extends State<HomePageChart> {
     });
   }
 
+  Future<void> _loadLatestInsulinData() async {
+    String userId =
+        await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
+    Map<String, dynamic>? insulinData = await firebaseService.FirebaseFunctions
+        .getLatestInsulinDataFromFirestore(userId);
+    String insulinValue = insulinData['insulinValue'];
+    setState(() {
+      widget.insulinValue = insulinValue;
+    });
+  }
+
+
   void _showSlidingUpPanel() async {
     try {
       String userId =
@@ -568,7 +580,6 @@ class _HomePageChartState extends State<HomePageChart> {
 
       [
         'Data',
-        'Hora',
         'Antes do café',
         '2h após o café',
         'Antes do almoço',
@@ -611,10 +622,8 @@ class _HomePageChartState extends State<HomePageChart> {
           break;
       }
 
-      // Adicionar os valores da data, hora e das colunas de refeição à linha da tabela
       tableData.add([
         formattedDate,
-        formattedTime,
         ...mealColumns,
       ]);
     }

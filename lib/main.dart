@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:glycon_app/Widgets/HeightSelectionDialog.dart';
 import 'package:glycon_app/pages/HomePageChart.dart';
 import 'package:glycon_app/Widgets/WeightPicker.dart';
+import 'package:glycon_app/Widgets/ChangeProfile.dart';
 import 'package:glycon_app/Widgets/forgotPassword.dart';
 import 'package:glycon_app/pages/welcomePage.dart';
 import 'package:go_router/go_router.dart';
@@ -88,12 +89,10 @@ final GoRouter _router = GoRouter(routes: <RouteBase>[
   GoRoute(
     path: '/weight',
     builder: (BuildContext context, GoRouterState state) {
-      String selectedWeight =
-          ''; 
+      String selectedWeight = '';
 
       return WeightPicker(
-        selectedWeight:
-            selectedWeight, 
+        selectedWeight: selectedWeight,
         weightController: null,
         onWeightChanged: (newWeight) {
           return newWeight;
@@ -104,12 +103,11 @@ final GoRouter _router = GoRouter(routes: <RouteBase>[
   GoRoute(
     path: '/height',
     builder: (BuildContext context, GoRouterState state) {
-      double? selectedHeight; 
+      double? selectedHeight;
 
       return HeightSelectionDialog(
         onHeightChanged: (newHeight) {
-          selectedHeight =
-              newHeight;
+          selectedHeight = newHeight;
         },
       );
     },
@@ -130,22 +128,19 @@ final GoRouter _router = GoRouter(routes: <RouteBase>[
   GoRoute(
     path: '/profilePage',
     builder: (BuildContext context, GoRouterState state) {
-      return ProfilePage(
-        glucoseValue: '',
-        newGlucoseValue: '',
-        pillValue: '',
-        newPillValue: '',
-        foodValue: '',
-        newFoodValue: '',
-        insulinValue: '',
-        newInsulinValue: '',
-      );
+      return ProfilePage();
     },
   ),
   GoRoute(
     path: '/charts',
     builder: (BuildContext context, GoRouterState state) {
       return HomePageChart();
+    },
+  ),
+  GoRoute(
+    path: '/changeProfile',
+    builder: (BuildContext context, GoRouterState state) {
+      return ChangeProfile();
     },
   ),
   GoRoute(

@@ -140,63 +140,6 @@ class FirebaseFunctions {
     }
   }
 
-  //obter todos dados glucose do dia
-  static Future<List<Map<String, dynamic>>> getGlucoseDataFromFirestore(
-      String userId, DateTime selectedDate) async {
-    // Obter a data selecionada
-    DateTime today =
-        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-
-    // Obter a data do dia seguinte
-    DateTime tomorrow =
-        DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
-
-    // Obter a referência da coleção
-    CollectionReference glucoseCollection = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('glicose');
-
-    // Converter os documentos em uma lista de mapas
-    QuerySnapshot querySnapshot = await glucoseCollection
-        .where('selectedDate',
-            isGreaterThanOrEqualTo: Timestamp.fromDate(today))
-        .where('selectedDate', isLessThan: Timestamp.fromDate(tomorrow))
-        .get();
-    List<Map<String, dynamic>> glucoseData = [];
-    querySnapshot.docs.forEach((doc) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      glucoseData.add(data);
-    });
-
-    return glucoseData;
-  }
-
-// obter insulina
-  static Future<Map<String, dynamic>> getLatestInsulinDataFromFirestore(
-    String userId,
-  ) async {
-    try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('insulina')
-          .orderBy('timestamp', descending: true)
-          .limit(1)
-          .get();
-      if (querySnapshot.docs.isEmpty) {
-        return {};
-      }
-      Map<String, dynamic> insulinData =
-          querySnapshot.docs.first.data() as Map<String, dynamic>;
-
-      return insulinData;
-    } catch (e) {
-      print('Erro ao obter os dados de insulina do Firestore: $e');
-      return {};
-    }
-  }
-
   // save user data
   static Future<void> saveUserNameToFirestore(
       String userId, String name) async {
@@ -296,6 +239,31 @@ class FirebaseFunctions {
       return firestore.doc(queryDocumentSnapshot.reference.path).get();
     } else {
       throw Exception('Nenhum documento encontrado');
+    }
+  }
+
+// obter insulina
+  static Future<Map<String, dynamic>> getLatestInsulinDataFromFirestore(
+    String userId,
+  ) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('insulina')
+          .orderBy('timestamp', descending: true)
+          .limit(1)
+          .get();
+      if (querySnapshot.docs.isEmpty) {
+        return {};
+      }
+      Map<String, dynamic> insulinData =
+          querySnapshot.docs.first.data() as Map<String, dynamic>;
+
+      return insulinData;
+    } catch (e) {
+      print('Erro ao obter os dados de insulina do Firestore: $e');
+      return {};
     }
   }
 
@@ -455,6 +423,134 @@ class FirebaseFunctions {
       print('Erro ao obter dados de glicose dos últimos 30 dias: $e');
       return [];
     }
+  }
+
+  // FUNCOES PARA PEGAR TODOS OS DADOS
+
+  // obter todos os dados de insulina
+  static Future<List<Map<String, dynamic>>> getInsulinDataFromFirestore(
+      String userId, DateTime selectedDate) async {
+    // Obter a data selecionada
+    DateTime today =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+
+    // Obter a data do dia seguinte
+    DateTime tomorrow =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
+
+    // Obter a referência da coleção
+    CollectionReference insulinCollection = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('insulina');
+
+    // Converter os documentos em uma lista de mapas
+    QuerySnapshot querySnapshot = await insulinCollection
+        .where('selectedDate',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(today))
+        .where('selectedDate', isLessThan: Timestamp.fromDate(tomorrow))
+        .get();
+    List<Map<String, dynamic>> insulinData = [];
+    querySnapshot.docs.forEach((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      insulinData.add(data);
+    });
+
+    return insulinData;
+  }
+
+  //obter todos dados glucose do dia
+  static Future<List<Map<String, dynamic>>> getGlucoseDataFromFirestore(
+      String userId, DateTime selectedDate) async {
+    // Obter a data selecionada
+    DateTime today =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+
+    // Obter a data do dia seguinte
+    DateTime tomorrow =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
+
+    // Obter a referência da coleção
+    CollectionReference glucoseCollection = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('glicose');
+
+    // Converter os documentos em uma lista de mapas
+    QuerySnapshot querySnapshot = await glucoseCollection
+        .where('selectedDate',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(today))
+        .where('selectedDate', isLessThan: Timestamp.fromDate(tomorrow))
+        .get();
+    List<Map<String, dynamic>> glucoseData = [];
+    querySnapshot.docs.forEach((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      glucoseData.add(data);
+    });
+
+    return glucoseData;
+  }
+
+  static Future<List<Map<String, dynamic>>> getPillDataFromFirestore(
+      String userId, DateTime selectedDate) async {
+    // Obter a data selecionada
+    DateTime today =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+
+    // Obter a data do dia seguinte
+    DateTime tomorrow =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
+
+    // Obter a referência da coleção
+    CollectionReference pillCollection = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('medicamentos');
+
+    // Converter os documentos em uma lista de mapas
+    QuerySnapshot querySnapshot = await pillCollection
+        .where('selectedDate',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(today))
+        .where('selectedDate', isLessThan: Timestamp.fromDate(tomorrow))
+        .get();
+    List<Map<String, dynamic>> pillDataList = [];
+    querySnapshot.docs.forEach((doc) {
+      Map<String, dynamic> pillData = doc.data() as Map<String, dynamic>;
+      pillDataList.add(pillData);
+    });
+
+    return pillDataList;
+  }
+
+  static Future<List<Map<String, dynamic>>> getFoodDataFromFirestore(
+      String userId, DateTime selectedDate) async {
+    // Obter a data selecionada
+    DateTime today =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+
+    // Obter a data do dia seguinte
+    DateTime tomorrow =
+        DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1);
+
+    // Obter a referência da coleção
+    CollectionReference foodCollection = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('alimentacao');
+
+    // Converter os documentos em uma lista de mapas
+    QuerySnapshot querySnapshot = await foodCollection
+        .where('selectedDate',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(today))
+        .where('selectedDate', isLessThan: Timestamp.fromDate(tomorrow))
+        .get();
+    List<Map<String, dynamic>> foodData = [];
+    querySnapshot.docs.forEach((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      foodData.add(data);
+    });
+
+    return foodData;
   }
 
 }

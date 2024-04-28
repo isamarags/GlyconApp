@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class BuildHealthItem extends StatelessWidget {
-  final String imagePath;
+  final String? imagePath;
   final String title;
   final String description;
   final Color backgroundColor;
   final String dateTime;
 
   const BuildHealthItem({
-    required this.imagePath,
+    this.imagePath,
     required this.title,
     required this.description,
     required this.backgroundColor,
@@ -23,7 +23,7 @@ class BuildHealthItem extends StatelessWidget {
       decoration: const BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFE7F1FF),
+            color: Color.fromARGB(255, 246, 249, 255),
             blurRadius: 8.0,
             spreadRadius: 5.0,
             offset: Offset(2, 4),
@@ -45,9 +45,9 @@ class BuildHealthItem extends StatelessWidget {
                 color: backgroundColor,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Image.asset(
-                imagePath,
-              ),
+              child: imagePath != null
+                  ? Image.asset(imagePath!)
+                  : null,
             ),
             SizedBox(width: 10),
             Flexible(

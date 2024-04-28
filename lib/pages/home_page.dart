@@ -8,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:glycon_app/services/FirebaseFunctions.dart' as firebaseService;
 import 'package:flutter_initicon/flutter_initicon.dart';
 import 'package:random_color/random_color.dart';
-
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
@@ -21,6 +20,9 @@ class LandingPage extends StatefulWidget {
   String? foodValue;
   final String? newInsulinValue;
   String? insulinValue;
+  int? quantityPill;
+  int? quantityFood;
+  String? insulinType;
 
   LandingPage({
     Key? key,
@@ -87,6 +89,8 @@ class _LandingPageState extends State<LandingPage> {
     String? userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
       _userId = userId;
+    } else {
+      print('Erro ao obter o userId do usuário');
     }
   }
 
@@ -103,7 +107,7 @@ class _LandingPageState extends State<LandingPage> {
           return AddOptionsPanel(
             userId: userId,
             onDataRegistered: () async {
-              await _loadLatestGlucoseData();
+              await _loadAllData();
               Navigator.pop(context);
             },
             glucoseValue: widget.glucoseValue,
@@ -138,31 +142,78 @@ class _LandingPageState extends State<LandingPage> {
     });
   }
 
+  Future<void> _loadLatestInsulinData() async {
+    String userId =
+        await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
+    Map<String, dynamic>? insulinData = await firebaseService.FirebaseFunctions
+        .getLatestInsulinDataFromFirestore(userId);
+    String insulinValue = insulinData['insulinValue'];
+    String insulinType = insulinData['insulinType'];
+    setState(() {
+      widget.insulinValue = insulinValue.toString();
+      widget.insulinType = insulinType.toString();
+    });
+  }
+
+  Future<void> _loadLatestMedicationData() async {
+    String userId =
+        await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
+    DocumentSnapshot? medicationData =
+        await firebaseService.FirebaseFunctions.getLastPillDataFromFirestore(
+            userId);
+    String namePill = medicationData['namePill'];
+    int quantityPill = medicationData['quantityPill'];
+    setState(() {
+      widget.pillValue = namePill;
+      widget.quantityPill = quantityPill;
+    });
+  }
+
+  Future<void> _loadLatestFoodData() async {
+    String userId =
+        await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
+    DocumentSnapshot? foodData =
+        await firebaseService.FirebaseFunctions.getLastFoodDataFromFirestore(
+            userId);
+    String nameFood = foodData!['nameFood'];
+    int foodQuantity = foodData['quantityFood'];
+    setState(() {
+      widget.foodValue = nameFood;
+      widget.quantityFood = foodQuantity;
+    });
+  }
+
+  Future<void> _loadAllData() async {
+    await _loadUserName();
+    await _loadUserData();
+    await _loadLatestGlucoseData();
+    await _loadLatestInsulinData();
+    await _loadLatestFoodData();
+    await _loadLatestMedicationData();
+  }
+
   void _navigateToPage(int index) {
     final router = GoRouter.of(context);
-
     switch (index) {
       case 0:
         router.go('/homePage');
         break;
       case 1:
-        router.go('/metas');
-        break;
-      case 2:
         _showSlidingUpPanel();
         break;
-      case 3:
+      case 2:
         router.go('/charts');
         break;
-      case 4:
+      case 3:
         router.go('/profilePage');
         break;
     }
   }
 
   void Function(int)? _onNavigationItemSelected(int index) {
-    _navigateToPage(index);
-    return null;
+    return (int index) {
+      _navigateToPage(index);
+    };
   }
 
   BottomNavigationBarItem _buildIcon(int index, IconData icon, String label) {
@@ -183,8 +234,7 @@ class _LandingPageState extends State<LandingPage> {
   String getInitials(String fullName) {
     List<String> names = fullName.split(' ');
     String initials = '';
-    int numWords =
-        2; // Altere para o número de palavras cujas iniciais você deseja pegar
+    int numWords = 2;
 
     if (names.length >= numWords) {
       for (int i = 0; i < numWords; i++) {
@@ -200,21 +250,15 @@ class _LandingPageState extends State<LandingPage> {
   }
 
   Color getColorForUserId(String userId) {
-    // Converte o ID do usuário em uma sequência de bytes
     List<int> bytes = utf8.encode(userId);
 
-    // Calcula o hash MD5 dos bytes do ID do usuário
     Digest md5Hash = md5.convert(bytes);
-
-    // Converte o hash em uma string hexadecimal
     String hexHash = md5Hash.toString();
 
-    // Extrai os valores hexadecimais para R, G e B
     int r = int.parse(hexHash.substring(0, 2), radix: 16);
     int g = int.parse(hexHash.substring(2, 4), radix: 16);
     int b = int.parse(hexHash.substring(4, 6), radix: 16);
 
-    // Retorna a cor correspondente
     return Color.fromRGBO(r, g, b, 1.0);
   }
 
@@ -223,324 +267,345 @@ class _LandingPageState extends State<LandingPage> {
     return FutureBuilder(
       future: firebaseService.FirebaseFunctions.getUserNameFromFirestore(),
       builder: (context, snapshot) {
-        String? userName = snapshot.data;
-        _userName = userName ?? '';
-        String initials = getInitials(_userName);
-        String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-        Color userBackgroundColor = getColorForUserId(userId);
-        return Scaffold(
-          backgroundColor: Colors.white,
-          body: RefreshIndicator(
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return RefreshIndicator(
+            child: SingleChildScrollView(),
             onRefresh: () async {
               await _loadUserName();
               await _loadUserData();
               await _loadLatestGlucoseData();
+              await _loadLatestInsulinData();
+              await _loadLatestFoodData();
+              await _loadLatestMedicationData();
             },
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: 50, horizontal: 15),
-                padding: EdgeInsets.only(top: 30),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Initicon(
-                                text: initials,
-                                backgroundColor: userBackgroundColor,
-                                size: 50,
-                              ),
-                              SizedBox(width: 15),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _userName ?? '',
-                                    style: TextStyle(
-                                      color: Color(0xFFB98282),
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                  Text(
-                                    _greeting,
-                                    style: TextStyle(
-                                      color: Color(0xFF4B0D07),
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 23,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              // Grade de menu
-                              // Spacer(),
-                              // Container(
-                              //   padding: EdgeInsets.only(right: 20),
-                              //   child: IconButton(
-                              //     icon: Icon(Icons.menu),
-                              //     iconSize: 40,
-                              //     color: Color(0xFF4B0D07),
-                              //     onPressed: () {},
-                              //   ),
-                              // ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      color: Colors.white,
-                      padding: EdgeInsets.all(20),
-                      margin: EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          FutureBuilder<Map<String, dynamic>?>(
-                            future: firebaseService.FirebaseFunctions
-                                .getLatestGlucoseDataFromFirestore(_userId),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text(
-                                    'Erro ao carregar os dados: ${snapshot.error}');
-                              } else {
-                                Map<String, dynamic>? glucoseData =
-                                    snapshot.data;
-                                if (glucoseData != null) {
-                                  String glucoseLevelString =
-                                      glucoseData['glucoseLevel'];
-                                  int glucoseLevel =
-                                      int.tryParse(glucoseLevelString) ?? 0;
-
-                                  bool withinRange =
-                                      glucoseLevel >= 70 && glucoseLevel <= 180;
-
-                                  String message = withinRange
-                                      ? '👍 $glucoseLevel mg/dl'
-                                      : '👎 $glucoseLevel mg/dl';
-                                  Color textColor = withinRange
-                                      ? Color(0xFF3F7332)
-                                      : Color(0xFFFF0000);
-
-                                  if (_firstTimeUser && glucoseLevel == 0) {
-                                    message = 'Nenhum dado registrado';
-                                    textColor = Colors.black;
-                                  }
-
-                                  return Container(
-                                    width: 217,
-                                    height: 120,
-                                    margin: EdgeInsets.only(bottom: 15),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
-                                      color: Color(0xFFD8A9A9),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Glicose',
-                                          style: TextStyle(
-                                            color: Color(0xFF4B0D07),
-                                            fontFamily: 'Montserrat',
-                                            fontSize: 25,
-                                            letterSpacing: 1,
-                                          ),
-                                        ),
-                                        Text(
-                                          message,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: textColor,
-                                            fontFamily: 'Montserrat',
-                                            fontSize: 22,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                } else {
-                                  return Text('Nenhum dado disponível');
-                                }
-                              }
-                            },
-                          ),
-                          SizedBox(height: 20),
-                          Padding(
-                            padding: EdgeInsets.only(
-                              left: 10,
-                            ),
-                            child: Row(
+          );
+        } else {
+          String? userName = snapshot.data;
+          _userName = userName ?? '';
+          String initials = getInitials(_userName);
+          String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+          Color userBackgroundColor = getColorForUserId(userId);
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: RefreshIndicator(
+              onRefresh: () async {
+                await _loadUserName();
+                await _loadUserData();
+                await _loadLatestGlucoseData();
+                await _loadLatestInsulinData();
+                await _loadLatestFoodData();
+                await _loadLatestMedicationData();
+              },
+              child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 50, horizontal: 15),
+                  padding: EdgeInsets.only(top: 30),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Text(
-                                  'Informações de Saúde 💊',
-                                  style: TextStyle(
+                                Initicon(
+                                  text: initials,
+                                  backgroundColor: userBackgroundColor,
+                                  size: 50,
+                                ),
+                                SizedBox(width: 15),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _userName ?? '',
+                                      style: TextStyle(
+                                        color: Color(0xFFB98282),
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                    Text(
+                                      _greeting,
+                                      style: TextStyle(
+                                        color: Color(0xFF4B0D07),
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 23,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // Grade de menu
+                                Spacer(),
+                                Container(
+                                  padding: EdgeInsets.only(right: 20),
+                                  child: IconButton(
+                                    icon: Icon(Icons.menu),
+                                    iconSize: 40,
                                     color: Color(0xFF4B0D07),
-                                    fontFamily: 'Montserrat',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
+                                    onPressed: () => context.go('/menu'),
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                          SizedBox(height: 15),
-                          FutureBuilder<DocumentSnapshot>(
-                            future: firebaseService.FirebaseFunctions
-                                .getLastPillDataFromFirestore(_userId),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<DocumentSnapshot> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('Erro: ${snapshot.error}');
-                              } else if (snapshot.hasData) {
-                                Map<String, dynamic> data = snapshot.data!
-                                    .data() as Map<String, dynamic>;
-
-                                Timestamp timestamp =
-                                    data['selectedDate'] ?? Timestamp.now();
-                                DateTime dateTime = timestamp.toDate();
-
-                                String formattedDateTime =
-                                    '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
-
-
-                                int pillQuantity = data['quantityPill'] ?? 0;
-                                String pillName= data['namePill'];
-
-                                String description = 
-                                    '$pillName \n${pillQuantity.toString()} unidades';
-
-                                return BuildHealthItem(
-                                  imagePath: 'lib/assets/images/medication.png',
-                                  title: 'Medicamento',
-                                  description: description,
-                                  backgroundColor: Colors.blue,
-                                  dateTime: formattedDateTime,
-                                );
-                              } else {
-                                return Text(
-                                    'Nenhum dado de medicamento encontrado');
-                              }
-                            },
-                          ),
-                          FutureBuilder<DocumentSnapshot>(
-                            future: firebaseService.FirebaseFunctions
-                                .getLastInsulinDataFromFirestore(_userId),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<DocumentSnapshot> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('Erro: ${snapshot.error}');
-                              } else if (snapshot.hasData) {
-                                Map<String, dynamic> data = snapshot.data!
-                                    .data() as Map<String, dynamic>;
-                                String insulinType =
-                                    data['insulinType'] ?? 'Desconhecido';
-                                String insulinValue =
-                                    data['insulinValue'] ?? 'Desconhecido';
-
-                                Timestamp timestamp =
-                                    data['selectedDate'] ?? Timestamp.now();
-                                DateTime dateTime = timestamp.toDate();
-
-                                String formattedDateTime =
-                                    '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
-
-                                return BuildHealthItem(
-                                  imagePath: 'lib/assets/images/insulin.png',
-                                  title: 'Insulina',
-                                  description: 'Tipo: $insulinType\nDosagem: $insulinValue UI',
-                                  backgroundColor: Colors.green,
-                                  dateTime: formattedDateTime,
-                                );
-                              } else {
-                                return Text(
-                                    'Nenhum dado de insulina encontrado');
-                              }
-                            },
-                          ),
-                          FutureBuilder<DocumentSnapshot>(
-                            future: firebaseService.FirebaseFunctions
-                                .getLastFoodDataFromFirestore(_userId),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<DocumentSnapshot> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('Erro: ${snapshot.error}');
-                              } else if (snapshot.hasData) {
-                                Map<String, dynamic> data = snapshot.data!
-                                    .data() as Map<String, dynamic>;
-
-                                Timestamp timestamp =
-                                    data['selectedDate'] ?? Timestamp.now();
-                                DateTime dateTime = timestamp.toDate();
-
-                                String formattedDateTime =
-                                    '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
-
-                                String foodDescription = data['nameFood'];
-                                double foodQuantity = data['quantityFood'] ?? 0;
-                                String foodType = data['typeFood'];
-
-                                String description = foodType == 'grama'
-                                    ? 'Alimento: $foodDescription \nPeso: ${foodQuantity.toString()} gramas'
-                                    : 'Alimento: $foodDescription \nQuantidade: ${foodQuantity.toString()} unidades';
-
-                                return BuildHealthItem(
-                                  imagePath: 'lib/assets/images/food.png',
-                                  title: 'Alimentação',
-                                  description: description,
-                                  backgroundColor: Colors.yellow,
-                                  dateTime: formattedDateTime,
-                                );
-                              } else {
-                                return Text(
-                                    'Nenhum dado de alimentação encontrado');
-                              }
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      Container(
+                        color: Colors.white,
+                        padding: EdgeInsets.all(20),
+                        margin: EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            FutureBuilder<Map<String, dynamic>?>(
+                              future: firebaseService.FirebaseFunctions
+                                  .getLatestGlucoseDataFromFirestore(_userId),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text(
+                                      'Erro ao carregar os dados: ${snapshot.error}');
+                                } else {
+                                  Map<String, dynamic>? glucoseData =
+                                      snapshot.data;
+                                  if (glucoseData != null) {
+                                    String glucoseLevelString =
+                                        glucoseData['glucoseLevel'];
+                                    int glucoseLevel =
+                                        int.tryParse(glucoseLevelString) ?? 0;
+
+                                    bool withinRange = glucoseLevel >= 70 &&
+                                        glucoseLevel <= 180;
+
+                                    String message = withinRange
+                                        ? '👍 $glucoseLevel mg/dl'
+                                        : '👎 $glucoseLevel mg/dl';
+                                    Color textColor = withinRange
+                                        ? Color(0xFF3F7332)
+                                        : Color(0xFFFF0000);
+
+                                    if (_firstTimeUser && glucoseLevel == 0) {
+                                      message = 'Nenhum dado registrado';
+                                      textColor = Colors.black;
+                                    }
+
+                                    return Container(
+                                      width: 217,
+                                      height: 120,
+                                      margin: EdgeInsets.only(bottom: 15),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(15),
+                                        color: Color(0xFFD8A9A9),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Glicose',
+                                            style: TextStyle(
+                                              color: Color(0xFF4B0D07),
+                                              fontFamily: 'Montserrat',
+                                              fontSize: 25,
+                                              letterSpacing: 1,
+                                            ),
+                                          ),
+                                          Text(
+                                            message,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontFamily: 'Montserrat',
+                                              fontSize: 22,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    return Text('Nenhum dado disponível');
+                                  }
+                                }
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                left: 10,
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Informações de Saúde 💊',
+                                    style: TextStyle(
+                                      color: Color(0xFF4B0D07),
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            FutureBuilder<DocumentSnapshot>(
+                              future: firebaseService.FirebaseFunctions
+                                  .getLastPillDataFromFirestore(_userId),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text('Erro: ${snapshot.error}');
+                                } else if (snapshot.hasData) {
+                                  Map<String, dynamic> data = snapshot.data!
+                                      .data() as Map<String, dynamic>;
+
+                                  Timestamp timestamp =
+                                      data['selectedDate'] ?? Timestamp.now();
+                                  DateTime dateTime = timestamp.toDate();
+
+                                  String formattedDateTime =
+                                      '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+
+                                  int pillQuantity = data['quantityPill'] ?? 0;
+                                  String pillName = data['namePill'];
+
+                                  String description =
+                                      '$pillName \nQuantidade: ${pillQuantity.toString()} unidades';
+
+                                  return BuildHealthItem(
+                                    imagePath:
+                                        'lib/assets/images/medication.png',
+                                    title: 'Medicamento',
+                                    description: description,
+                                    backgroundColor: Colors.blue,
+                                    dateTime: formattedDateTime,
+                                  );
+                                } else {
+                                  return Text(
+                                      'Nenhum dado de medicamento encontrado');
+                                }
+                              },
+                            ),
+                            FutureBuilder<DocumentSnapshot>(
+                              future: firebaseService.FirebaseFunctions
+                                  .getLastInsulinDataFromFirestore(_userId),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text('Erro: ${snapshot.error}');
+                                } else if (snapshot.hasData) {
+                                  Map<String, dynamic> data = snapshot.data!
+                                      .data() as Map<String, dynamic>;
+                                  String insulinType =
+                                      data['insulinType'] ?? 'Desconhecido';
+                                  String insulinValue =
+                                      data['insulinValue'] ?? 'Desconhecido';
+
+                                  Timestamp timestamp =
+                                      data['selectedDate'] ?? Timestamp.now();
+                                  DateTime dateTime = timestamp.toDate();
+
+                                  String formattedDateTime =
+                                      '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+
+                                  return BuildHealthItem(
+                                    imagePath: 'lib/assets/images/insulin.png',
+                                    title: 'Insulina',
+                                    description:
+                                        'Tipo: $insulinType\nDosagem: $insulinValue UI',
+                                    backgroundColor: Colors.green,
+                                    dateTime: formattedDateTime,
+                                  );
+                                } else {
+                                  return Text(
+                                      'Nenhum dado de insulina encontrado');
+                                }
+                              },
+                            ),
+                            FutureBuilder<DocumentSnapshot>(
+                              future: firebaseService.FirebaseFunctions
+                                  .getLastFoodDataFromFirestore(_userId),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text('Erro: ${snapshot.error}');
+                                } else if (snapshot.hasData) {
+                                  Map<String, dynamic> data = snapshot.data!
+                                      .data() as Map<String, dynamic>;
+
+                                  Timestamp timestamp =
+                                      data['selectedDate'] ?? Timestamp.now();
+                                  DateTime dateTime = timestamp.toDate();
+
+                                  String formattedDateTime =
+                                      '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+
+                                  String foodDescription = data['nameFood'];
+                                  double foodQuantity =
+                                      data['quantityFood'] ?? 0;
+                                  String formattedQuantity =
+                                      foodQuantity.toStringAsFixed(1);
+
+                                  String foodType = data['typeFood'];
+
+                                  String description = foodType == 'grama'
+                                      ? 'Alimento: $foodDescription \nPeso: ${formattedQuantity} gramas'
+                                      : 'Alimento: $foodDescription \nQuantidade: ${formattedQuantity} unidades';
+
+                                  return BuildHealthItem(
+                                    imagePath: 'lib/assets/images/food.png',
+                                    title: 'Alimentação',
+                                    description: description,
+                                    backgroundColor: Colors.yellow,
+                                    dateTime: formattedDateTime,
+                                  );
+                                } else {
+                                  return Text(
+                                      'Nenhum dado de alimentação encontrado');
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          bottomNavigationBar: Theme(
-            data: Theme.of(context).copyWith(
-              canvasColor: null,
+            bottomNavigationBar: Theme(
+              data: Theme.of(context).copyWith(
+                canvasColor: null,
+              ),
+              child: BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _navigateToPage,
+                type: BottomNavigationBarType.fixed,
+                items: [
+                  _buildIcon(0, Icons.home, 'Home'),
+                  _buildIcon(1, Icons.equalizer, 'Registrar'),
+                  _buildIcon(2, Icons.share, 'Relatórios'),
+                  _buildIcon(3, Icons.person, 'Conta'),
+                ],
+              ),
             ),
-            child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              onTap: _navigateToPage,
-              type: BottomNavigationBarType.fixed,
-              items: [
-                _buildIcon(0, Icons.home, 'Home'),
-                _buildIcon(1, Icons.star, 'Metas'),
-                _buildIcon(2, Icons.equalizer, 'Registrar'),
-                _buildIcon(3, Icons.share, 'Relatórios'),
-                _buildIcon(4, Icons.person, 'Conta'),
-              ],
-            ),
-          ),
-        );
+          );
+        }
       },
     );
   }

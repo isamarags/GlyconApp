@@ -188,7 +188,7 @@ class _InsertInsulinState extends State<InsertInsulin> {
                     setState(() {
                       selectedInsulin = newValue!;
 
-                      selectedInsulinType = newValue; 
+                      selectedInsulinType = newValue;
                     });
                   },
                   items:
