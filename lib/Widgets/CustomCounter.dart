@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 class CustomCounter extends StatelessWidget {
-  final Function() onIncrement;
-  final Function() onDecrement;
   final int quantity;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
 
-  CustomCounter({
+  const CustomCounter({
+    Key? key,
+    required this.quantity,
     required this.onIncrement,
     required this.onDecrement,
-    required this.quantity, // Adicionado
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +21,11 @@ class CustomCounter extends StatelessWidget {
           onPressed: onDecrement,
         ),
         Text(
-          '$quantity', // Modificado para exibir a quantidade atual
-          style: TextStyle(fontSize: 16),
+          '$quantity',
+          style: TextStyle(
+            fontSize: 20,
+            color: Color(0xFF4B0D07),
+          ),
         ),
         IconButton(
           icon: Icon(Icons.add),

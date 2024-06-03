@@ -4,14 +4,14 @@ class BuildHealthItem extends StatelessWidget {
   final String? imagePath;
   final String title;
   final String description;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final String dateTime;
 
   const BuildHealthItem({
     this.imagePath,
     required this.title,
     required this.description,
-    required this.backgroundColor,
+    this.backgroundColor,
     required this.dateTime,
     Key? key,
   }) : super(key: key);
@@ -51,13 +51,12 @@ class BuildHealthItem extends StatelessWidget {
             ),
             SizedBox(width: 10),
             Flexible(
-              // Usando Flexible para ajustar a altura do contêiner
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    softWrap: false, // Evita quebra de texto no título
+                    softWrap: false,
                     style: TextStyle(
                         fontSize: 16,
                         color: Color(0xFF4B0D07),
@@ -65,7 +64,7 @@ class BuildHealthItem extends StatelessWidget {
                   ),
                   SizedBox(
                       height:
-                          5), // Ajuste de espaço entre o título e a descrição
+                          5), 
                   Text(
                     description,
                     style: TextStyle(

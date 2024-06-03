@@ -119,6 +119,9 @@ class GetUserData {
     }
   }
 
+  // get diabetes type
+  
+
   static Future<void> saveUserFundoscopiaDateToFirestore(
       String userId, DateTime fundoscopiaDate) async {
     try {
@@ -142,6 +145,32 @@ class GetUserData {
     }
   }
 
+  static Future<DateTime> getUserFundoscopiaDateFromFirestore(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        Map<String, dynamic>? userData =
+            userDoc.data() as Map<String, dynamic>?;
+        if (userData != null && userData.containsKey('fundoscopiaDate')) {
+          return userData['fundoscopiaDate'].toDate();
+        } else {
+          print('Fundoscopia do usuário não encontrada');
+          return DateTime.now();
+        }
+      } else {
+        print('Documento do usuário não encontrado');
+        return DateTime.now();
+      }
+    } catch (e) {
+      print('Erro ao buscar Fundoscopia do usuário no Firestore: $e');
+      throw e;
+    }
+  }
+
   static Future<void> saveUserRACDateToFirestore(
       String userId, DateTime RACDate) async {
     try {
@@ -161,6 +190,32 @@ class GetUserData {
       print('RAC do usuário salvo com sucesso no Firestore');
     } catch (e) {
       print('Erro ao salvar peso do usuário no Firestore: $e');
+      throw e;
+    }
+  }
+
+  static Future<DateTime> getUserRACDateFromFirestore(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        Map<String, dynamic>? userData =
+            userDoc.data() as Map<String, dynamic>?;
+        if (userData != null && userData.containsKey('RACDate')) {
+          return userData['RACDate'].toDate();
+        } else {
+          print('RAC do usuário não encontrado');
+          return DateTime.now();
+        }
+      } else {
+        print('Documento do usuário não encontrado');
+        return DateTime.now();
+      }
+    } catch (e) {
+      print('Erro ao buscar RAC do usuário no Firestore: $e');
       throw e;
     }
   }
@@ -280,7 +335,7 @@ class GetUserData {
   }
 
   // pegar altura a partir do usuario logado
-  static Future<List<Map<String, dynamic>>> getUserHeightFromFirestore(
+  static Future<double> getUserHeightFromFirestore(
       String userId) async {
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
@@ -293,15 +348,14 @@ class GetUserData {
             userDoc.data() as Map<String, dynamic>?;
 
         if (userData != null && userData.containsKey('height')) {
-          List<Map<String, dynamic>> heightData = [userData['height']];
-          return heightData;
+          return userData['height'];
         } else {
           print('Altura do usuário não encontrada');
-          return [];
+          return 0;
         }
       } else {
         print('Documento do usuário não encontrado');
-        return [];
+        return 0;
       }
     } catch (e) {
       print('Erro ao buscar altura do usuário no Firestore: $e');
@@ -364,4 +418,5 @@ class GetUserData {
       print('Erro ao deletar usuário: $e');
     }
   }
+
 }

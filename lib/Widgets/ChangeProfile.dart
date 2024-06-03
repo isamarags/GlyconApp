@@ -5,6 +5,7 @@ import 'package:glycon_app/Widgets/HeightSelectionDialog.dart';
 import 'package:glycon_app/Widgets/WeightPicker.dart';
 import 'package:glycon_app/Services/FirebaseFunctions.dart';
 import 'package:glycon_app/services/getUserData.dart';
+// import 'package:glycon_app/services/updateUserData.dart';
 
 class ChangeProfile extends StatefulWidget {
   final double? selectedWeight;
@@ -17,20 +18,24 @@ class ChangeProfile extends StatefulWidget {
 
 class _ChangeProfileState extends State<ChangeProfile> {
   TextEditingController weightController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
-  List<String> gender = ["Selecionar", "Masculino", "Feminino"];
-  String selectedGender = "Selecionar";
+  DateTime currentBirthDate = DateTime.now();
+  List<String> gender = ["Editar", "Masculino", "Feminino"];
+  late String loadSelectedGender = "Editar";
+  String selectedGender = '';
+  String currentGender = '';
   double? selectedHeight;
   double? selectedWeight;
+  double? currentHeight;
+  double? currentWeight;
+  String currentName = '';
+
 
   @override
   void initState() {
     loadUserData();
-    print('Selected weight: ${widget.selectedWeight}');
-    if (widget.selectedWeight != null) {
-      selectedWeight = widget.selectedWeight;
-    }
     super.initState();
   }
 
@@ -38,22 +43,24 @@ class _ChangeProfileState extends State<ChangeProfile> {
     try {
       String userId = await FirebaseFunctions.getUserIdFromFirestore();
 
-      String loadSelectedGender =
+      String currentName = await FirebaseFunctions.getUserNameFromFirestore();
+      nameController.text = currentName;
+
+      String currentGender =
           await GetUserData.getUserGenderFromFirestore(userId);
-      List<Map<String, dynamic>> heightData =
+      double currentHeight =
           await GetUserData.getUserHeightFromFirestore(userId);
-      double loadSelectedHeight =
-          heightData.isNotEmpty ? heightData[0]['height'].toDouble() : null;
-      double loadSelectedWeight =
+      double currentWeight =
           await GetUserData.getUserWeightFromFirestore(userId);
-      DateTime loadSelectedDate =
+      DateTime currentBirthDate =
           await GetUserData.getUserBirthDateFromFirestore(userId);
 
       setState(() {
-        selectedGender = loadSelectedGender;
-        selectedHeight = loadSelectedHeight;
-        selectedWeight = loadSelectedWeight;
-        selectedDate = loadSelectedDate;
+        loadSelectedGender = currentGender;
+        selectedGender = currentGender;
+        selectedHeight = currentHeight;
+        selectedWeight = currentWeight;
+        selectedDate = currentBirthDate;
       });
     } catch (e) {
       print('Erro ao carregar dados do usuário: $e');
@@ -66,13 +73,18 @@ class _ChangeProfileState extends State<ChangeProfile> {
       builder: (BuildContext context) {
         return HeightSelectionDialog(
           onHeightChanged: (novaAltura) {
-            setState(() {
-              selectedHeight = novaAltura;
-            });
+            setState(() {});
           },
+          initialHeight: selectedHeight ?? 1.60,
         );
       },
-    );
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          selectedHeight = value.toDouble();
+        });
+      }
+    });
   }
 
   void openWeightPicker(BuildContext context) {
@@ -80,16 +92,20 @@ class _ChangeProfileState extends State<ChangeProfile> {
       context: context,
       builder: (BuildContext context) {
         return WeightPicker(
-          selectedWeight: selectedWeight.toString(),
+          selectedWeight: selectedWeight,
           weightController: weightController,
           onWeightChanged: (newWeight) {
-            setState(() {
-              selectedWeight = double.parse(newWeight);
-            });
+            setState(() {});
           },
         );
       },
-    );
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          selectedWeight = value;
+        });
+      }
+    });
   }
 
   @override
@@ -142,20 +158,65 @@ class _ChangeProfileState extends State<ChangeProfile> {
                       ),
                       SizedBox(width: 10),
                       Text(
+                        'Nome',
+                        style: GoogleFonts.montserrat(
+                            color: Color(0xFFB98282),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      Spacer(),
+                      Container(
+                        width: 200,
+                        child: TextField(
+                          controller: nameController,
+                          onSubmitted: (newName) async {
+                            String userId = await FirebaseFunctions
+                                .getUserIdFromFirestore();
+                            String currentName = await FirebaseFunctions
+                                .getUserNameFromFirestore();
+                            nameController.text = currentName;
+
+                            if (newName != null && newName.isNotEmpty) {
+                              await FirebaseFunctions.saveUserNameToFirestore(
+                                  userId, newName);
+                            }
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Alterar',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 30),
+                  Divider(
+                    color: Color(0xFFF0F0F0),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.person, color: Color(0xFF4B0D07)),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
                         'Genero',
                         style: GoogleFonts.montserrat(
                             color: Color(0xFFB98282),
                             fontSize: 16,
                             fontWeight: FontWeight.w400),
                       ),
-                      SizedBox(width: 100),
+                      Spacer(),
                       DropdownButton<String>(
-                        value: selectedGender,
-                        onChanged: (String? newGender) {
-                          setState(() {
-                            selectedGender = newGender!;
-                          });
-                        },
+                        value: loadSelectedGender,
+                        onChanged: (String? newGender) {},
                         items: gender.map((String gender) {
                           return DropdownMenuItem<String>(
                             value: gender,
@@ -170,7 +231,6 @@ class _ChangeProfileState extends State<ChangeProfile> {
                           );
                         }).toList(),
                       ),
-                      Spacer(),
                     ],
                   ),
                   SizedBox(height: 30),
@@ -259,7 +319,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                         onTap: () => openWeightPicker(context),
                         child: Text(
                           selectedWeight == null
-                              ? 'Selecionar'
+                              ? 'Editar'
                               : selectedWeight.toString(),
                           style: GoogleFonts.montserrat(
                             color: Color(0xFF4B0D07),
@@ -301,9 +361,8 @@ class _ChangeProfileState extends State<ChangeProfile> {
                         onTap: () => openHeightSelectionDialog(context),
                         child: Text(
                           selectedHeight == null
-                              ? 'Selecionar'
-                              : (selectedHeight! / 100).toStringAsFixed(
-                                  2), // Formatando para centímetros
+                              ? 'Editar'
+                              : selectedHeight!.toStringAsFixed(2),
                           style: GoogleFonts.montserrat(
                             color: Color(0xFF4B0D07),
                             fontSize: 16,
@@ -319,63 +378,125 @@ class _ChangeProfileState extends State<ChangeProfile> {
                       String userId =
                           await FirebaseFunctions.getUserIdFromFirestore();
 
-                      if (selectedGender == "Selecionar") {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Por favor, selecione um gênero antes de continuar'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        return;
-                      } else if (selectedWeight == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Por favor, selecione um peso antes de continuar'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        return;
-                      } else if (selectedHeight == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Por favor, selecione uma altura antes de continuar'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        return;
-                      } else if (selectedDate == DateTime.now()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                'Por favor, selecione uma data de nascimento antes de continuar'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      } else {
-                        await GetUserData.saveUserGenderToFirestore(
-                            userId, selectedGender);
-                        await GetUserData.saveUserHeightToFirestore(
-                            userId, selectedHeight!);
+                      bool shouldUpdate = false;
 
+                      // Verificar e atualizar o nome
+                      if (nameController.text.isNotEmpty &&
+                          nameController.text != currentName) {
+                        await FirebaseFunctions.saveUserNameToFirestore(
+                            userId, nameController.text);
+                        shouldUpdate = true;
+                      }
+
+                      // Verificar e atualizar o gênero
+                      if (loadSelectedGender != 'Editar' &&
+                          loadSelectedGender != currentGender) {
+                        await GetUserData.saveUserGenderToFirestore(
+                            userId, loadSelectedGender);
+                        shouldUpdate = true;
+                      }
+
+                      // Verificar e atualizar o peso
+                      if (selectedWeight != null &&
+                          selectedWeight != currentWeight) {
                         await GetUserData.saveUserWeightToFirestore(
                             userId, selectedWeight!);
+                        shouldUpdate = true;
+                      }
 
+                      // Verificar e atualizar a altura
+                      if (selectedHeight != null &&
+                          selectedHeight != currentHeight) {
+                        await GetUserData.saveUserHeightToFirestore(
+                            userId, selectedHeight!);
+                        shouldUpdate = true;
+                      }
+
+                      // Verificar e atualizar a data de nascimento
+                      if (selectedDate != null &&
+                          selectedDate != currentBirthDate) {
                         await GetUserData.saveUserBirthDateToFirestore(
                             userId, selectedDate);
+                        shouldUpdate = true;
+                      }
 
+                      if (shouldUpdate) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Dados atualizados com sucesso!'),
                             duration: Duration(seconds: 2),
                           ),
                         );
-
                         context.go('/profilePage');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Nenhum dado foi alterado.'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
                       }
                     },
+
+                    // if (selectedGender == "Editar") {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       content: Text(
+                    //           'Por favor, selecione um gênero antes de continuar'),
+                    //       duration: Duration(seconds: 2),
+                    //     ),
+                    //   );
+                    //   return;
+                    // } else if (selectedWeight == null ||
+                    //     selectedWeight == 0.0) {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       content: Text(
+                    //           'Por favor, selecione um peso antes de continuar'),
+                    //       duration: Duration(seconds: 2),
+                    //     ),
+                    //   );
+                    //   return;
+                    // } else if (selectedHeight == null ||
+                    //     selectedHeight == 0.0) {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       content: Text(
+                    //           'Por favor, selecione uma altura antes de continuar'),
+                    //       duration: Duration(seconds: 2),
+                    //     ),
+                    //   );
+                    //   return;
+                    // } else if (selectedDate == null ||
+                    //     selectedDate.day == DateTime.now().day) {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       content: Text(
+                    //           'Por favor, selecione uma data de nascimento antes de continuar'),
+                    //       duration: Duration(seconds: 2),
+                    //     ),
+                    //   );
+                    //   return;
+                    // } else {
+                    //   await GetUserData.saveUserGenderToFirestore(
+                    //       userId, selectedGender);
+                    //   await GetUserData.saveUserHeightToFirestore(
+                    //       userId, selectedHeight!.toDouble());
+                    //   await GetUserData.saveUserWeightToFirestore(
+                    //       userId, selectedWeight!);
+                    //   await GetUserData.saveUserBirthDateToFirestore(
+                    //       userId, selectedDate);
+
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       content: Text('Dados atualizados com sucesso!'),
+                    //       duration: Duration(seconds: 2),
+                    //     ),
+                    //   );
+
+                    //   context.go('/profilePage');
+                    // }
+                    // },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFD8A9A9),
                       shape: RoundedRectangleBorder(

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:glycon_app/Widgets/CustomBottomNavigationBarItem.dart';
 import 'package:glycon_app/Widgets/AddOptionsPanel.dart';
 import 'package:glycon_app/Widgets/BuildHealthItem.dart';
-import 'package:go_router/go_router.dart';
+import 'package:glycon_app/Widgets/BuildHealthItemGlucose.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:glycon_app/services/FirebaseFunctions.dart' as firebaseService;
@@ -10,6 +9,13 @@ import 'package:flutter_initicon/flutter_initicon.dart';
 import 'package:random_color/random_color.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:go_router/go_router.dart';
+import 'package:glycon_app/Widgets/NavigationBar.dart' as Navigation;
+
+import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
+import 'package:glycon_app/Widgets/CustomBottomNavigationBarItem.dart';
+import 'package:glycon_app/pages/HomePageChart.dart';
+import 'package:glycon_app/pages/profile_page.dart';
 
 class LandingPage extends StatefulWidget {
   final String? newGlucoseValue;
@@ -26,8 +32,8 @@ class LandingPage extends StatefulWidget {
 
   LandingPage({
     Key? key,
-    required this.glucoseValue,
-    required this.newGlucoseValue,
+    this.glucoseValue,
+    this.newGlucoseValue,
     this.pillValue,
     this.newPillValue,
     this.foodValue,
@@ -120,7 +126,6 @@ class _LandingPageState extends State<LandingPage> {
             insulinValue: widget.insulinValue,
             onClose: () {
               Navigator.pop(context);
-              _navigateToPage(0);
             },
           );
         },
@@ -190,45 +195,6 @@ class _LandingPageState extends State<LandingPage> {
     await _loadLatestInsulinData();
     await _loadLatestFoodData();
     await _loadLatestMedicationData();
-  }
-
-  void _navigateToPage(int index) {
-    final router = GoRouter.of(context);
-    switch (index) {
-      case 0:
-        router.go('/homePage');
-        break;
-      case 1:
-        _showSlidingUpPanel();
-        break;
-      case 2:
-        router.go('/charts');
-        break;
-      case 3:
-        router.go('/profilePage');
-        break;
-    }
-  }
-
-  void Function(int)? _onNavigationItemSelected(int index) {
-    return (int index) {
-      _navigateToPage(index);
-    };
-  }
-
-  BottomNavigationBarItem _buildIcon(int index, IconData icon, String label) {
-    final customItem = CustomBottomNavigationBarItem(
-      index: index,
-      icon: icon,
-      label: label,
-      selectedIndex: _selectedIndex,
-      onTap: () => _onNavigationItemSelected(index),
-    );
-
-    return BottomNavigationBarItem(
-      icon: Icon(customItem.icon),
-      label: customItem.label,
-    );
   }
 
   String getInitials(String fullName) {
@@ -340,16 +306,16 @@ class _LandingPageState extends State<LandingPage> {
                                   ],
                                 ),
                                 // Grade de menu
-                                Spacer(),
-                                Container(
-                                  padding: EdgeInsets.only(right: 20),
-                                  child: IconButton(
-                                    icon: Icon(Icons.menu),
-                                    iconSize: 40,
-                                    color: Color(0xFF4B0D07),
-                                    onPressed: () => context.go('/menu'),
-                                  ),
-                                ),
+                                // Spacer(),
+                                // Container(
+                                //   padding: EdgeInsets.only(right: 20),
+                                //   child: IconButton(
+                                //     icon: Icon(Icons.menu),
+                                //     iconSize: 40,
+                                //     color: Color(0xFF4B0D07),
+                                //     onPressed: () => context.go('/menu'),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ],
@@ -395,38 +361,14 @@ class _LandingPageState extends State<LandingPage> {
                                       textColor = Colors.black;
                                     }
 
-                                    return Container(
-                                      width: 217,
-                                      height: 120,
-                                      margin: EdgeInsets.only(bottom: 15),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        color: Color(0xFFD8A9A9),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Glicose',
-                                            style: TextStyle(
-                                              color: Color(0xFF4B0D07),
-                                              fontFamily: 'Montserrat',
-                                              fontSize: 25,
-                                              letterSpacing: 1,
-                                            ),
-                                          ),
-                                          Text(
-                                            message,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: textColor,
-                                              fontFamily: 'Montserrat',
-                                              fontSize: 22,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                    return BuildHealthItemGlucose(
+                                      title: 'Glicose',
+                                      description: message,
+                                      backgroundColor: textColor,
+                                      dateTime:
+                                          glucoseData.containsKey('dateTime')
+                                              ? glucoseData['dateTime']
+                                              : '',
                                     );
                                   } else {
                                     return Text('Nenhum dado disponível');
@@ -468,6 +410,17 @@ class _LandingPageState extends State<LandingPage> {
                                   Map<String, dynamic> data = snapshot.data!
                                       .data() as Map<String, dynamic>;
 
+                                  if (data['isPrimary']) {
+                                    return BuildHealthItem(
+                                      imagePath:
+                                          'lib/assets/images/medication.png',
+                                      title: 'Medicamento',
+                                      description: 'Nenhum dado registrado',
+                                      backgroundColor: Colors.blue,
+                                      dateTime: '',
+                                    );
+                                  }
+
                                   Timestamp timestamp =
                                       data['selectedDate'] ?? Timestamp.now();
                                   DateTime dateTime = timestamp.toDate();
@@ -480,6 +433,8 @@ class _LandingPageState extends State<LandingPage> {
 
                                   String description =
                                       '$pillName \nQuantidade: ${pillQuantity.toString()} unidades';
+
+                                  print('Pill data: $data');
 
                                   return BuildHealthItem(
                                     imagePath:
@@ -508,26 +463,44 @@ class _LandingPageState extends State<LandingPage> {
                                 } else if (snapshot.hasData) {
                                   Map<String, dynamic> data = snapshot.data!
                                       .data() as Map<String, dynamic>;
-                                  String insulinType =
-                                      data['insulinType'] ?? 'Desconhecido';
-                                  String insulinValue =
-                                      data['insulinValue'] ?? 'Desconhecido';
 
-                                  Timestamp timestamp =
-                                      data['selectedDate'] ?? Timestamp.now();
-                                  DateTime dateTime = timestamp.toDate();
+                                  if (data['isPrimary']) {
+                                    return BuildHealthItem(
+                                      imagePath:
+                                          'lib/assets/images/insulin.png',
+                                      title: 'Insulina',
+                                      description: 'Nenhum dado registrado',
+                                      backgroundColor: Colors.green,
+                                      dateTime: '',
+                                    );
+                                  }
+                                  // Verificar se há dados de insulina disponíveis
+                                  if (data.isNotEmpty) {
+                                    String insulinType =
+                                        data['insulinType'] ?? 'Desconhecido';
+                                    String insulinValue =
+                                        data['insulinValue'] ?? 'Desconhecido';
 
-                                  String formattedDateTime =
-                                      '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+                                    Timestamp timestamp =
+                                        data['selectedDate'] ?? Timestamp.now();
+                                    DateTime dateTime = timestamp.toDate();
 
-                                  return BuildHealthItem(
-                                    imagePath: 'lib/assets/images/insulin.png',
-                                    title: 'Insulina',
-                                    description:
-                                        'Tipo: $insulinType\nDosagem: $insulinValue UI',
-                                    backgroundColor: Colors.green,
-                                    dateTime: formattedDateTime,
-                                  );
+                                    String formattedDateTime =
+                                        '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+
+                                    return BuildHealthItem(
+                                      imagePath:
+                                          'lib/assets/images/insulin.png',
+                                      title: 'Insulina',
+                                      description:
+                                          'Tipo: $insulinType\nDosagem: $insulinValue UI',
+                                      backgroundColor: Colors.green,
+                                      dateTime: formattedDateTime,
+                                    );
+                                  } else {
+                                    return Text(
+                                        'Nenhum dado de insulina encontrado');
+                                  }
                                 } else {
                                   return Text(
                                       'Nenhum dado de insulina encontrado');
@@ -548,6 +521,16 @@ class _LandingPageState extends State<LandingPage> {
                                   Map<String, dynamic> data = snapshot.data!
                                       .data() as Map<String, dynamic>;
 
+                                  if (data['isPrimary']) {
+                                    return BuildHealthItem(
+                                      imagePath: 'lib/assets/images/food.png',
+                                      title: 'Alimentação',
+                                      description: 'Nenhum dado registrado',
+                                      backgroundColor: Colors.yellow,
+                                      dateTime: '',
+                                    );
+                                  }
+
                                   Timestamp timestamp =
                                       data['selectedDate'] ?? Timestamp.now();
                                   DateTime dateTime = timestamp.toDate();
@@ -556,8 +539,7 @@ class _LandingPageState extends State<LandingPage> {
                                       '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
 
                                   String foodDescription = data['nameFood'];
-                                  double foodQuantity =
-                                      data['quantityFood'] ?? 0;
+                                  int foodQuantity = data['quantityFood'] ?? 0;
                                   String formattedQuantity =
                                       foodQuantity.toStringAsFixed(1);
 
@@ -588,21 +570,8 @@ class _LandingPageState extends State<LandingPage> {
                 ),
               ),
             ),
-            bottomNavigationBar: Theme(
-              data: Theme.of(context).copyWith(
-                canvasColor: null,
-              ),
-              child: BottomNavigationBar(
-                currentIndex: _selectedIndex,
-                onTap: _navigateToPage,
-                type: BottomNavigationBarType.fixed,
-                items: [
-                  _buildIcon(0, Icons.home, 'Home'),
-                  _buildIcon(1, Icons.equalizer, 'Registrar'),
-                  _buildIcon(2, Icons.share, 'Relatórios'),
-                  _buildIcon(3, Icons.person, 'Conta'),
-                ],
-              ),
+            bottomNavigationBar: Navigation.NavigationBar(
+              currentIndex: 0,
             ),
           );
         }

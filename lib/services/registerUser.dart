@@ -36,33 +36,36 @@ Future<void> registerUser(
 
         await FirebaseFunctions.FirebaseFunctions.saveGlucoseToFirestore(
           selectedDate: DateTime.now(),
-          glucoseLevel: '0', 
-          mealTime: 'Tipo de refeição não adicionado.', 
-          userId: newUser.uid, 
+          glucoseLevel: '0',
+          mealTime: 'Tipo de refeição não adicionado.',
+          userId: newUser.uid,
         );
 
         await FirebaseFunctions.FirebaseFunctions.saveInsulinDataToFirestore(
           selectedDate: DateTime.now(),
-          insulinValue: 'Insulina não adicionado.', 
+          insulinValue: '0',
           beforeMealSelected: false,
-          afterMealSelected: false, 
+          afterMealSelected: false,
           insulinType: 'Tipo de insulina não adicionado.',
-          userId: newUser.uid, 
+          userId: newUser.uid,
+          isPrimary: true,
         );
 
         await FirebaseFunctions.FirebaseFunctions.savePillDataToFirestore(
           selectedDate: DateTime.now(),
           namePill: 'Medicamento não adicionado.',
           quantityPill: 0,
-          userId: newUser.uid, 
+          userId: newUser.uid,
+          isPrimary: true,
         );
 
         await FirebaseFunctions.FirebaseFunctions.saveFoodDataToFirestore(
           selectedDate: DateTime.now(),
-          nameFood: 'Alimento não adicionado',
-          quantityFood: 0, 
-          userId: newUser.uid, 
-          typeFood: '', 
+          nameFood: 'não adicionado',
+          quantityFood: 0,
+          userId: newUser.uid,
+          typeFood: '',
+          isPrimary: true,
         );
 
         context.go('/about');

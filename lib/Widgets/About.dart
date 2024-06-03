@@ -8,8 +8,10 @@ import 'package:glycon_app/services/getUserData.dart';
 
 class About extends StatefulWidget {
   final double? selectedWeight;
+  final double? selectedHeight;
 
-  const About({Key? key, this.selectedWeight}) : super(key: key);
+  const About({Key? key, this.selectedWeight, this.selectedHeight})
+      : super(key: key);
 
   @override
   State<About> createState() => _AboutState();
@@ -40,13 +42,18 @@ class _AboutState extends State<About> {
       builder: (BuildContext context) {
         return HeightSelectionDialog(
           onHeightChanged: (novaAltura) {
-            setState(() {
-              selectedHeight = novaAltura;
-            });
+            setState(() {});
           },
+          initialHeight: selectedHeight ?? 1.60,
         );
       },
-    );
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          selectedHeight = value.toDouble();
+        });
+      }
+    });
   }
 
   void openWeightPicker(BuildContext context) {
@@ -54,20 +61,27 @@ class _AboutState extends State<About> {
       context: context,
       builder: (BuildContext context) {
         return WeightPicker(
-          selectedWeight: selectedWeight.toString(),
+          selectedWeight: selectedWeight,
           weightController: weightController,
           onWeightChanged: (newWeight) {
-            setState(() {
-              selectedWeight = double.parse(newWeight);
-            });
+            setState(() {});
           },
         );
       },
-    );
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          selectedWeight = value;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -79,7 +93,8 @@ class _AboutState extends State<About> {
         ),
       ),
       body: Container(
-        height: MediaQuery.of(context).size.height,
+        height: screenHeight,
+        width: screenWidth,
         child: ListView(
           children: [
             Container(
@@ -285,8 +300,7 @@ class _AboutState extends State<About> {
                         child: Text(
                           selectedHeight == null
                               ? 'Selecionar'
-                              : (selectedHeight! / 100).toStringAsFixed(
-                                  2), // Formatando para centímetros
+                              : selectedHeight!.toStringAsFixed(2),
                           style: GoogleFonts.montserrat(
                             color: Color(0xFF4B0D07),
                             fontSize: 16,
@@ -302,24 +316,7 @@ class _AboutState extends State<About> {
                       String userId =
                           await FirebaseFunctions.getUserIdFromFirestore();
 
-                      if (selectedGender != "Selecionar" &&
-                          selectedWeight != 0.0 &&
-                          selectedHeight != 0.0 &&
-                          selectedDate != DateTime.now()) {
-                        await GetUserData.saveUserGenderToFirestore(
-                            userId, selectedGender);
-                        await GetUserData.saveUserWeightToFirestore(
-                            userId, selectedWeight ?? 0.0);
-                        await GetUserData.saveUserHeightToFirestore(
-                            userId, selectedHeight ?? 0.0);
-
-                        await GetUserData.saveUserBirthDateToFirestore(
-                            userId, selectedDate);
-
-                        context.go('/health');
-                      } else {
-                        // Mostra uma mensagem de erro ou alerta ao usuário
-                        // indicando que é necessário selecionar um gênero antes de continuar
+                      if (selectedGender == "Selecionar") {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -327,6 +324,48 @@ class _AboutState extends State<About> {
                             duration: Duration(seconds: 2),
                           ),
                         );
+                        return;
+                      } else if (selectedWeight == null ||
+                          selectedWeight == 0.0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Por favor, selecione um peso antes de continuar'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      } else if (selectedHeight == null ||
+                          selectedHeight == 0.0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Por favor, selecione uma altura antes de continuar'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      } else if (selectedDate == null ||
+                          selectedDate.day == DateTime.now().day) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Por favor, selecione uma data de nascimento antes de continuar'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      } else {
+                        await GetUserData.saveUserGenderToFirestore(
+                            userId, selectedGender);
+                        await GetUserData.saveUserHeightToFirestore(
+                            userId, selectedHeight!.toDouble());
+                        await GetUserData.saveUserWeightToFirestore(
+                            userId, selectedWeight!);
+                        await GetUserData.saveUserBirthDateToFirestore(
+                            userId, selectedDate);
+
+                        context.go('/health');
                       }
                     },
                     style: ElevatedButton.styleFrom(

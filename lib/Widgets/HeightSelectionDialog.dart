@@ -4,8 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class HeightSelectionDialog extends StatefulWidget {
   final Function(double) onHeightChanged;
+  final double initialHeight;
 
-  const HeightSelectionDialog({Key? key, required this.onHeightChanged})
+  const HeightSelectionDialog(
+      {Key? key, required this.onHeightChanged, this.initialHeight = 1.60})
       : super(key: key);
 
   @override
@@ -13,93 +15,61 @@ class HeightSelectionDialog extends StatefulWidget {
 }
 
 class _HeightSelectionDialogState extends State<HeightSelectionDialog> {
-  double selectedHeight = 160.0;
+  late double selectedHeight;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedHeight = widget.initialHeight;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-          child: Container(
-            color: Colors.black.withOpacity(0.5),
+    return AlertDialog(
+      title: Text('Selecionar altura'),
+      backgroundColor: Colors.white,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Escolha sua altura em centímetros:'),
+          SizedBox(height: 20),
+          DropdownButton<double>(
+            value: selectedHeight,
+            dropdownColor: Color.fromARGB(255, 255, 255, 255),
+            onChanged: (value) {
+              setState(() {
+                selectedHeight = value!;
+              });
+            },
+            items: List.generate(200, (index) => (index + 100) / 100.0)
+                .map((double value) {
+              return DropdownMenuItem<double>(
+                value: value,
+                child: Text(value.toStringAsFixed(2)),
+              );
+            }).toList(),
           ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text(
+            'Cancelar', 
+            style: TextStyle(color: Color(0xFF4B0D07))),
         ),
-        AlertDialog(
-          title: Text(
-            'Selecionar altura',
-            style: GoogleFonts.montserrat(
-              color: Color(0xFF4B0D07),
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop(selectedHeight);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF4B0D07),
           ),
-          backgroundColor: Colors.white,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Escolha sua altura em centímetros:',
-                style: GoogleFonts.montserrat(
-                  color: Color(0xFF4B0D07),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: 20),
-              Slider(
-                thumbColor: Color(0xFF4B0D07),
-                activeColor: Color(0xFFD8A9A9),
-                inactiveColor: Color.fromARGB(144, 216, 169, 169),
-                value: selectedHeight,
-                min: 100,
-                max: 220,
-                onChanged: (newHeight) {
-                  setState(() {
-                    selectedHeight = newHeight;
-                  });
-                  widget.onHeightChanged(newHeight);
-                },
-              ),
-              Text(
-                'Altura selecionada: ${selectedHeight.toStringAsFixed(1)} cm',
-                style: GoogleFonts.montserrat(
-                  color: Color(0xFF4B0D07),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'OK',
-                style: GoogleFonts.montserrat(
-                  color: Color(0xFF4B0D07),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'Cancelar',
-                style: GoogleFonts.montserrat(
-                  color: Color(0xFF4B0D07),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
+          child: Text(
+            'OK', 
+            style: TextStyle(color: Color(0xFFFFFFFF))),
         ),
       ],
     );

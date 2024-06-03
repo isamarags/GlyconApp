@@ -3,15 +3,15 @@ import 'package:glycon_app/services/datePickerService.dart';
 import 'package:glycon_app/services/FirebaseFunctions.dart';
 
 class InsertBloodGlucose extends StatefulWidget {
+  final VoidCallback closeOptionsPanel;
   final String userId;
   final void Function() onDataRegistered;
-  final VoidCallback closeOptionsPanel;
 
   const InsertBloodGlucose({
     Key? key,
+    required this.closeOptionsPanel,
     required this.userId,
     required this.onDataRegistered,
-    required this.closeOptionsPanel,
   }) : super(key: key);
 
   @override
@@ -274,8 +274,7 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
               onPressed: () {
                 if (glucoseLevelController.text.isNotEmpty &&
                     selectedMealTime != null) {
-                  dateTimeController.text =
-                      "${selectedDate.toLocal()} ${selectedTime.format(context)}";
+                  print('Selected dateaa: $selectedDate');
 
                   FirebaseFunctions.saveGlucoseToFirestore(
                     selectedDate: selectedDate,
@@ -286,8 +285,12 @@ class _InsertBloodGlucoseState extends State<InsertBloodGlucose> {
                     userId: widget.userId,
                   );
 
-                  widget.onDataRegistered();
+                  //print('Data registeredaaaa');
                   widget.closeOptionsPanel();
+                  widget.onDataRegistered();
+
+                  //widget.onDataRegistered();
+                  // print('Data registered');
                 } else {
                   showDialog(
                     context: context,

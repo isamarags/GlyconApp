@@ -10,20 +10,21 @@ void closeAllModals(BuildContext context) {
 
 void showSlidingUpBloodGlucose(BuildContext context, String userId,
     VoidCallback onDataRegisteredCallback) {
+  closeAllModals(context);
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
+    isDismissible: true,
     builder: (context) {
       return InsertBloodGlucose(
-        userId: userId,
         onDataRegistered: () {
           onDataRegisteredCallback();
         },
         closeOptionsPanel: () {
-          Navigator.pop(
-              context); // Fecha o sliding up panel do InsertBloodGlucose
+          Navigator.pop(context);
         },
+        userId: userId,
       );
     },
   );

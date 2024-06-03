@@ -6,10 +6,15 @@ import 'package:glycon_app/services/FirebaseFunctions.dart' as firebaseService;
 import 'package:glycon_app/services/getUserData.dart';
 import 'package:glycon_app/Widgets/AddOptionsPanel.dart';
 import 'package:glycon_app/Widgets/CustomBottomNavigationBarItem.dart';
+import 'package:glycon_app/Widgets/NavigationBar.dart' as Navigation;
 import 'package:flutter_initicon/flutter_initicon.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
+
+import 'package:glycon_app/pages/HomePageChart.dart';
+import 'package:glycon_app/pages/home_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String? newGlucoseValue;
@@ -32,10 +37,6 @@ class ProfilePage extends StatefulWidget {
     this.insulinValue,
     this.newInsulinValue,
   }) : super(key: key);
-
-  void navigateToPage(int index) {
-    _ProfilePageState().navigateToPage(index);
-  }
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -109,7 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
             insulinValue: widget.insulinValue,
             onClose: () {
               Navigator.pop(context);
-              navigateToPage(4);
+              _navigateToPage(3);
             },
           );
         },
@@ -184,7 +185,7 @@ class _ProfilePageState extends State<ProfilePage> {
     await _getUserDiabetesTypeFromFirestore();
   }
 
-  void navigateToPage(int index) {
+  void _navigateToPage(int index) {
     final router = GoRouter.of(context);
     switch (index) {
       case 0:
@@ -200,11 +201,12 @@ class _ProfilePageState extends State<ProfilePage> {
         router.go('/profilePage');
         break;
     }
+
+    print('Página selecionada: $index');
   }
 
-  void Function(int)? _onNavigationItemSelected(int index) {
-    navigateToPage(index);
-    return null;
+  void _onNavigationItemSelected(int index) {
+    return _navigateToPage(index);
   }
 
   BottomNavigationBarItem _buildIcon(int index, IconData icon, String label) {
@@ -217,7 +219,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     return BottomNavigationBarItem(
-      icon: Icon(customItem.icon),
+      icon: Icon(
+        customItem.icon,
+      ),
       label: customItem.label,
     );
   }
@@ -250,6 +254,24 @@ class _ProfilePageState extends State<ProfilePage> {
     int b = int.parse(hexHash.substring(4, 6), radix: 16);
 
     return Color.fromRGBO(r, g, b, 1.0);
+  }
+
+  String formatSubtitle(String subtitle) {
+    List<String> words = subtitle.split(' ');
+    String newSubtitle = '';
+    String line = '';
+
+    for (String word in words) {
+      if ((line + word).length > 30) {
+        newSubtitle += line.trim() + '\n';
+        line = '';
+      }
+      line += word + ' ';
+    }
+
+    newSubtitle += line.trim();
+
+    return newSubtitle;
   }
 
   @override
@@ -321,7 +343,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                               Text(
-                                '${_userDiabetesType != null ? (_userDiabetesType == 'Gestacional' ? 'Diabetes ' + _userDiabetesType : 'Diabetes tipo ' + _userDiabetesType) : ''}',
+                                '${_userDiabetesType != null ? (_userDiabetesType == 'Gestacional' ? 'Diabetes ' + _userDiabetesType : 'Diabetes ' + _userDiabetesType) : ''}',
                                 style: TextStyle(
                                   fontSize: 15,
                                   color: Color(0xFF808080),
@@ -341,6 +363,43 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 50, top: 20),
+                      //   child: Align(
+                      //     alignment: Alignment.centerLeft,
+                      //     child: Text(
+                      //       'Registros de saúde',
+                      //       style: TextStyle(
+                      //         fontSize: 18,
+                      //         color: Color(0xFF4B0D07),
+                      //         fontFamily: 'Montserrat',
+                      //         fontWeight: FontWeight.w400,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      // SizedBox(height: 20),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 50, right: 40),
+                      //   child: Column(
+                      //     children: [
+                      //       buildRowItem(
+                      //         icon: Icons.person,
+                      //         title: 'Ver registros',
+                      //         subtitle: formatSubtitle(
+                      //             'Dados de saúde registrados anteriormente'),
+                      //         onTap: () {
+                      //           context.go('/teste');
+                      //         },
+                      //       ),
+                      //       SizedBox(height: 8),
+                      //       Divider(
+                      //         color: Colors.grey,
+                      //         thickness: 0.2,
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                       Padding(
                         padding: const EdgeInsets.only(left: 50, top: 20),
                         child: Align(
@@ -364,7 +423,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             buildRowItem(
                               icon: Icons.person,
                               title: 'Perfil',
-                              subtitle: 'Nome, idade, gênero...',
+                              subtitle: formatSubtitle('Nome, idade, gênero...'),
                               onTap: () {
                                 context.go('/changeProfile');
                               },
@@ -379,7 +438,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 icon: Icons.bloodtype,
                                 title: 'Saúde',
                                 subtitle: 'Tipo de diabetes, medicamentos...',
-                                onTap: () {}),
+                                onTap: () {
+                                  context.go('/changeHealth');
+                                }),
                             SizedBox(height: 8),
                             Divider(
                               color: Colors.grey,
@@ -409,28 +470,28 @@ class _ProfilePageState extends State<ProfilePage> {
                         padding: const EdgeInsets.only(left: 50, right: 40),
                         child: Column(
                           children: [
-                            buildRowItem(
-                                icon: Icons.security,
-                                title: 'Segurança',
-                                subtitle: 'Alterar senha ou e-mail',
-                                onTap: () {}),
-                            SizedBox(height: 8),
-                            Divider(
-                              color: Colors.grey,
-                              thickness: 0.2,
-                            ),
-                            SizedBox(height: 8),
-                            buildRowItem(
-                                icon: Icons.edit_document,
-                                title: 'Termos',
-                                subtitle: 'Leia nossos termos de uso',
-                                onTap: () {}),
-                            SizedBox(height: 8),
-                            Divider(
-                              color: Colors.grey,
-                              thickness: 0.2,
-                            ),
-                            SizedBox(height: 8),
+                            // buildRowItem(
+                            //     icon: Icons.security,
+                            //     title: 'Segurança',
+                            //     subtitle: 'Alterar senha ou e-mail',
+                            //     onTap: () {}),
+                            // SizedBox(height: 8),
+                            // Divider(
+                            //   color: Colors.grey,
+                            //   thickness: 0.2,
+                            // ),
+                            // SizedBox(height: 8),
+                            // buildRowItem(
+                            //     icon: Icons.edit_document,
+                            //     title: 'Termos',
+                            //     subtitle: 'Leia nossos termos de uso',
+                            //     onTap: () {}),
+                            // SizedBox(height: 8),
+                            // Divider(
+                            //   color: Colors.grey,
+                            //   thickness: 0.2,
+                            // ),
+                            // SizedBox(height: 8),
                             buildRowItem(
                                 icon: Icons.logout,
                                 title: 'Sair',
@@ -462,22 +523,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          canvasColor: null,
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: navigateToPage,
-          type: BottomNavigationBarType.fixed,
-          items: [
-            _buildIcon(0, Icons.home, 'Home'),
-            _buildIcon(1, Icons.equalizer, 'Registrar'),
-            _buildIcon(2, Icons.share, 'Relatórios'),
-            _buildIcon(3, Icons.person, 'Conta'),
-          ],
-        ),
-      ),
+      bottomNavigationBar: Navigation.NavigationBar(
+        currentIndex: 3,
+      )
     );
   }
 }

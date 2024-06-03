@@ -3,6 +3,7 @@ import 'package:glycon_app/Widgets/HeightSelectionDialog.dart';
 import 'package:glycon_app/pages/HomePageChart.dart';
 import 'package:glycon_app/Widgets/WeightPicker.dart';
 import 'package:glycon_app/Widgets/ChangeProfile.dart';
+import 'package:glycon_app/Widgets/ChangeHealth.dart';
 import 'package:glycon_app/Widgets/forgotPassword.dart';
 import 'package:glycon_app/pages/welcomePage.dart';
 import 'package:go_router/go_router.dart';
@@ -11,9 +12,9 @@ import 'package:glycon_app/pages/createAccount_page.dart';
 import 'package:glycon_app/pages/login_page.dart';
 import 'package:glycon_app/Widgets/About.dart';
 import 'package:glycon_app/Widgets/Health.dart';
+import 'package:glycon_app/Widgets/ViewHistory.dart';
 import 'package:glycon_app/pages/home_page.dart';
 import 'package:glycon_app/pages/metasPage.dart';
-import 'Widgets/InsertBloodGlucose.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:glycon_app/pages/profile_page.dart';
@@ -74,22 +75,13 @@ final GoRouter _router = GoRouter(routes: <RouteBase>[
   GoRoute(
     path: '/homePage',
     builder: (BuildContext context, GoRouterState state) {
-      return LandingPage(
-        glucoseValue: '',
-        newGlucoseValue: '',
-        pillValue: '',
-        newPillValue: '',
-        foodValue: '',
-        newFoodValue: '',
-        insulinValue: '',
-        newInsulinValue: '',
-      );
+      return LandingPage();
     },
   ),
   GoRoute(
     path: '/weight',
     builder: (BuildContext context, GoRouterState state) {
-      String selectedWeight = '';
+      double selectedWeight = 60.0;
 
       return WeightPicker(
         selectedWeight: selectedWeight,
@@ -144,18 +136,15 @@ final GoRouter _router = GoRouter(routes: <RouteBase>[
     },
   ),
   GoRoute(
-    path: '/insertBloodGlucose',
+    path: '/changeHealth',
     builder: (BuildContext context, GoRouterState state) {
-      final userId = ModalRoute.of(context)!.settings.arguments as String;
-      return InsertBloodGlucose(
-        userId: userId,
-        onDataRegistered: () {
-          Navigator.pop(context);
-        },
-        closeOptionsPanel: () {
-          Navigator.pop(context);
-        },
-      );
+      return ChangeHealth();
+    },
+  ),
+  GoRoute(
+    path: '/teste',
+    builder: (BuildContext context, GoRouterState state) {
+      return ViewHistory();
     },
   ),
 ]);

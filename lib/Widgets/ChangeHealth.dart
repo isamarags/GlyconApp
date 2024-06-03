@@ -4,46 +4,65 @@ import 'package:go_router/go_router.dart';
 import 'package:glycon_app/services/getUserData.dart';
 import 'package:glycon_app/Services/FirebaseFunctions.dart';
 
-class Health extends StatefulWidget {
-  const Health({Key? key}) : super(key: key);
+class ChangeHealth extends StatefulWidget {
+  const ChangeHealth({Key? key}) : super(key: key);
 
   @override
-  State<Health> createState() => _HealthState();
+  State<ChangeHealth> createState() => _ChangeHealthState();
 }
 
-class _HealthState extends State<Health> {
+class _ChangeHealthState extends State<ChangeHealth> {
   DateTime selectedFundoscopiaDate = DateTime.now();
+  DateTime currentFundoscopiaDate = DateTime.now();
   DateTime selectedRACDate = DateTime.now();
+  DateTime currentRACDate = DateTime.now();
+  List<String> typeDiabetes = ["Editar", "Tipo 1", "Tipo 2", "Gestacional"];
+  late String loadSelectedDiabetesType = "Editar";
+  String selectedDiabetesType = '';
+  String currentDiabetesType = '';
 
-  List<String> typeDiabetes = ["Selecionar", "Tipo 1", "Tipo 2", "Gestacional"];
-  String typeDiabetesSelected = "Selecionar";
+  @override
+  void initState() {
+    loadUserData();
+    super.initState();
+  }
 
-  List<String> optionsTreatment = [
-    "Medicamento",
-    "Insulina",
-    "Dieta",
-    "Exercício físico"
-  ];
-  List<String> selectedTreatments = [];
+  void loadUserData() async {
+    try {
+      String userId = await FirebaseFunctions.getUserIdFromFirestore();
+
+      String currentDiabetesType =
+          await GetUserData.getUserDiabetesTypeFromFirestore(userId);
+      DateTime fundoscopiaDate =
+          await GetUserData.getUserFundoscopiaDateFromFirestore(userId);
+      DateTime RACDate = await GetUserData.getUserRACDateFromFirestore(userId);
+
+      setState(() {
+        loadSelectedDiabetesType = currentDiabetesType;
+        selectedDiabetesType = currentDiabetesType;
+        selectedFundoscopiaDate = fundoscopiaDate;
+        selectedRACDate = RACDate;
+      });
+    } catch (e) {
+      print('Erro ao carregar dados do usuário: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           padding: EdgeInsets.only(left: 35),
-          onPressed: () => context.go('/about'),
+          onPressed: () => context.go('/profilePage'),
           color: Color(0xFF4B0D07),
         ),
       ),
       body: Container(
-        width: screenWidth,
-        height: screenHeight,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.symmetric(horizontal: 39),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -52,13 +71,12 @@ class _HealthState extends State<Health> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Informações de saúde',
+                'Editar informações de saúde',
                 style: GoogleFonts.montserrat(
                   color: Color(0xFF4B0D07),
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                 ),
-                textAlign: TextAlign.justify,
               ),
             ),
             SizedBox(height: 10),
@@ -114,11 +132,13 @@ class _HealthState extends State<Health> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: DropdownButton<String>(
-                        value: typeDiabetesSelected,
+                        value: loadSelectedDiabetesType,
                         onChanged: (String? newTypeDiabetes) {
-                          setState(() {
-                            typeDiabetesSelected = newTypeDiabetes!;
-                          });
+                          if (newTypeDiabetes != null) {
+                            setState(() {
+                              loadSelectedDiabetesType = newTypeDiabetes;
+                            });
+                          }
                         },
                         items: typeDiabetes.map((String tipo) {
                           return DropdownMenuItem<String>(
@@ -301,20 +321,47 @@ class _HealthState extends State<Health> {
                 String userId =
                     await FirebaseFunctions.getUserIdFromFirestore();
 
-                GetUserData.saveUserDiabetesTypeToFirestore(
-                    userId, typeDiabetesSelected);
-                GetUserData.saveUserFundoscopiaDateToFirestore(
-                    userId, selectedFundoscopiaDate);
-                GetUserData.saveUserRACDateToFirestore(userId, selectedRACDate);
+                bool shouldUpdate = false;
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Dados salvos com sucesso!'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
+                if (loadSelectedDiabetesType != 'Editar' &&
+                    loadSelectedDiabetesType != currentDiabetesType) {
+                  await GetUserData.saveUserDiabetesTypeToFirestore(
+                      userId, loadSelectedDiabetesType);
+                  shouldUpdate = true;
+                }
 
-                context.go('/homePage');
+                if (selectedRACDate != null &&
+                    selectedRACDate != currentRACDate) {
+                  await GetUserData.saveUserBirthDateToFirestore(
+                      userId, selectedRACDate);
+                  shouldUpdate = true;
+                }
+
+                if (selectedFundoscopiaDate != null &&
+                    selectedFundoscopiaDate != currentFundoscopiaDate) {
+                  await GetUserData.saveUserFundoscopiaDateToFirestore(
+                      userId, selectedFundoscopiaDate);
+                  shouldUpdate = true;
+                }
+
+                if (shouldUpdate) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Dados atualizados com sucesso!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  context.go('/profilePage');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Nenhum dado foi alterado.'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+
+                context.go('/profilePage');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFD8A9A9),

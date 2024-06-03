@@ -272,7 +272,7 @@ class _InsertFoodState extends State<InsertFood> {
               ),
             if (showQuantityField)
               SizedBox(
-                width: 120, // Defina a largura que você deseja
+                width: 150, // Defina a largura que você deseja
                 height: 50, // Defina a altura que você deseja
                 child: Counter.CustomCounter(
                   quantity: quantityFood, // Passando a quantidade atual
@@ -327,9 +327,9 @@ class _InsertFoodState extends State<InsertFood> {
                     },
                   );
                 } else {
-                  double quantity = showQuantityField
-                      ? quantityFood.toDouble()
-                      : double.tryParse(quantityController.text) ?? 0;
+                  int quantity = showQuantityField
+                    ? quantityFood
+                    : int.parse(quantityController.text.toString());
 
                   FirebaseFunctions.saveFoodDataToFirestore(
                     selectedDate: selectedDate,

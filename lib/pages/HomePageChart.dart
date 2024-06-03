@@ -3,19 +3,11 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:glycon_app/services/FirebaseFunctions.dart';
-import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
-// import 'package:csv/csv.dart';
-import 'package:flutter_share/flutter_share.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/foundation.dart';
-// import 'package:pdf/pdf.dart';
+// import 'package:flutter_share/flutter_share.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:pdf/widgets.dart' as pw;
-
-// import 'package:glycon_app/pages/home_page.dart';
-import 'package:glycon_app/Widgets/CustomBottomNavigationBarItem.dart';
-import 'package:glycon_app/services/FirebaseFunctions.dart' as firebaseService;
-import 'package:glycon_app/Widgets/AddOptionsPanel.dart';
+import 'package:glycon_app/Widgets/NavigationBar.dart' as Navigation;
 
 class _GlicemiaData {
   final DateTime time;
@@ -68,7 +60,7 @@ class _HomePageChartState extends State<HomePageChart> {
   final GlobalKey _chartKey = GlobalKey();
   String userId = '';
   String fullName = '';
-  int _selectedIndex = 3;
+  int _selectedIndex = 2;
 
   @override
   void initState() {
@@ -95,7 +87,6 @@ class _HomePageChartState extends State<HomePageChart> {
       for (Map<String, dynamic> data in glucoseDataList) {
         DateTime myDateTime = DateTime.fromMillisecondsSinceEpoch(
             data['selectedDate'].seconds * 1000);
-
         glucoseDataForLine.add(_GlicemiaData(
             myDateTime,
             double.parse(data['glucoseLevel']),
@@ -176,106 +167,105 @@ class _HomePageChartState extends State<HomePageChart> {
     }
   }
 
-  void _navigateToPage(index) {
-    final router = GoRouter.of(context);
-    switch (index) {
-      case 0:
-        router.go('/homePage');
-        break;
-      case 1:
-        router.go('/metas');
-        break;
-      case 2:
-        _showSlidingUpPanel();
-        break;
-      case 3:
-        router.go('/charts');
-        break;
-      case 4:
-        router.go('/profilePage');
-        break;
-    }
-  }
+  // void _navigateToPage(index) {
+  //   final router = GoRouter.of(context);
+  //   switch (index) {
+  //     case 0:
+  //       router.go('/homePage');
+  //       break;
+  //     // case 1:
+  //     //   router.go('/metas');
+  //     //   break;
+  //     case 1:
+  //       _showSlidingUpPanel();
+  //       break;
+  //     case 2:
+  //       router.go('/charts');
+  //       break;
+  //     case 3:
+  //       router.go('/profilePage');
+  //       break;
+  //   }
+  //   print('Página selecionada: $index');
+  // }
 
-  void Function(int)? _onNavigationItemSelected(int index) {
-    _navigateToPage(index);
-    return null;
-  }
+  // void _onNavigationItemSelected(int index) {
+  //   setState(() {
+  //     _selectedIndex = index;
+  //   });
+  //   return _navigateToPage(index);
+  // }
 
-  BottomNavigationBarItem _buildIcon(int index, IconData icon, String label) {
-    final customItem = CustomBottomNavigationBarItem(
-      index: index,
-      icon: icon,
-      label: label,
-      selectedIndex: _selectedIndex,
-      onTap: () => _onNavigationItemSelected(index),
-    );
+  // BottomNavigationBarItem _buildIcon(int index, IconData icon, String label) {
+  //   final customItem = CustomBottomNavigationBarItem(
+  //     index: index,
+  //     icon: icon,
+  //     label: label,
+  //     selectedIndex: _selectedIndex,
+  //     onTap: () => _onNavigationItemSelected(index),
+  //   );
 
-    return BottomNavigationBarItem(
-      icon: Icon(customItem.icon),
-      label: customItem.label,
-    );
-  }
+  //   return BottomNavigationBarItem(
+  //     icon: Icon(customItem.icon),
+  //     label: customItem.label,
+  //   );
+  // }
 
-  Future<void> _loadLatestGlucoseData() async {
-    String userId =
-        await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
-    Map<String, dynamic>? glucoseData = await firebaseService.FirebaseFunctions
-        .getLatestGlucoseDataFromFirestore(userId);
-    String glucoseLevelString = glucoseData['glucoseLevel'];
-    int glucoseLevel = int.tryParse(glucoseLevelString) ?? 0;
-    setState(() {
-      widget.glucoseValue = glucoseLevel.toString();
-    });
-  }
+  // Future<void> _loadLatestGlucoseData() async {
+  //   String userId = await FirebaseFunctions.getUserIdFromFirestore();
+  //   Map<String, dynamic>? glucoseData =
+  //       await FirebaseFunctions.getLatestGlucoseDataFromFirestore(userId);
+  //   String glucoseLevelString = glucoseData['glucoseLevel'];
+  //   int glucoseLevel = int.tryParse(glucoseLevelString) ?? 0;
+  //   setState(() {
+  //     widget.glucoseValue = glucoseLevel.toString();
+  //   });
+  // }
 
-  Future<void> _loadLatestInsulinData() async {
-    String userId =
-        await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
-    Map<String, dynamic>? insulinData = await firebaseService.FirebaseFunctions
-        .getLatestInsulinDataFromFirestore(userId);
-    String insulinValue = insulinData['insulinValue'];
-    setState(() {
-      widget.insulinValue = insulinValue;
-    });
-  }
+  // Future<void> _loadLatestInsulinData() async {
+  //   String userId = await FirebaseFunctions.getUserIdFromFirestore();
+  //   Map<String, dynamic>? insulinData =
+  //       await FirebaseFunctions.getLatestInsulinDataFromFirestore(userId);
+  //   String insulinValue = insulinData['insulinValue'];
+  //   setState(() {
+  //     widget.insulinValue = insulinValue;
+  //   });
+  // }
 
+  // void _showSlidingUpPanel() async {
+  //   try {
+  //     String userId = await FirebaseFunctions.getUserIdFromFirestore();
 
-  void _showSlidingUpPanel() async {
-    try {
-      String userId =
-          await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
-
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) {
-          return AddOptionsPanel(
-            userId: userId,
-            onDataRegistered: () async {
-              await _loadLatestGlucoseData();
-              Navigator.pop(context);
-            },
-            glucoseValue: widget.glucoseValue,
-            newGlucoseValue: widget.newGlucoseValue,
-            newPillValue: widget.newPillValue,
-            pillValue: widget.pillValue,
-            newFoodValue: widget.newFoodValue,
-            foodValue: widget.foodValue,
-            newInsulinValue: widget.newInsulinValue,
-            insulinValue: widget.insulinValue,
-            onClose: () {
-              Navigator.pop(context);
-              _navigateToPage(0);
-            },
-          );
-        },
-      );
-    } catch (e) {
-      print('Erro ao obter o userId do Firestore: $e');
-    }
-  }
+  //     showModalBottomSheet(
+  //       context: context,
+  //       isScrollControlled: true,
+  //       backgroundColor: Colors.transparent,
+  //       builder: (context) {
+  //         return AddOptionsPanel(
+  //           userId: userId,
+  //           onDataRegistered: () async {
+  //             await _loadLatestGlucoseData();
+  //             Navigator.pop(context);
+  //           },
+  //           glucoseValue: widget.glucoseValue,
+  //           newGlucoseValue: widget.newGlucoseValue,
+  //           newPillValue: widget.newPillValue,
+  //           pillValue: widget.pillValue,
+  //           newFoodValue: widget.newFoodValue,
+  //           foodValue: widget.foodValue,
+  //           newInsulinValue: widget.newInsulinValue,
+  //           insulinValue: widget.insulinValue,
+  //           onClose: () {
+  //             Navigator.pop(context);
+  //             _navigateToPage(2);
+  //           },
+  //         );
+  //       },
+  //     );
+  //   } catch (e) {
+  //     print('Erro ao obter o userId do Firestore: $e');
+  //   }
+  // }
 
   Widget _buildChart() {
     switch (_selectedChartType) {
@@ -352,120 +342,136 @@ class _HomePageChartState extends State<HomePageChart> {
 
   @override
   Widget build(BuildContext context) {
-    String dateRangeText =
-        _calculateDateRangeText(selectedStartDate, selectedEndDate);
+    String dateRangeText = _selectedChartType == ChartType.line
+        ? DateFormat.yMMMd().format(selectedDate)
+        : _calculateDateRangeText(selectedStartDate, selectedEndDate);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        // leading: IconButton(
-        //   icon: Icon(Icons.arrow_back),
-        //   padding: EdgeInsets.only(left: 35),
-        //   onPressed: () => context.go('/homePage'),
-        //   color: Color(0xFF4B0D07),
-        // ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.calendar_today),
-            onPressed: _selectedChartType == ChartType.line
-                ? () async {
-                    final DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(2015, 8),
-                      lastDate: DateTime(2101),
-                    );
-
-                    if (picked != null && picked != selectedDate)
-                      setState(() {
-                        selectedDate = picked;
-                        _fetchGlucoseData(selectedDate);
-                      });
-                  }
-                : _selectedChartType == ChartType.bar
-                    ? () async {
-                        final DateTimeRange? picked = await showDateRangePicker(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          // leading: IconButton(
+          //   icon: Icon(Icons.arrow_back),
+          //   padding: EdgeInsets.only(left: 35),
+          //   onPressed: () => context.go('/homePage'),
+          //   color: Color(0xFF4B0D07),
+          // ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.calendar_today),
+              onPressed: _selectedChartType == ChartType.line
+                  ? () async {
+                      final DateTime? picked = await showDatePicker(
                           context: context,
-                          firstDate: DateTime(2015),
+                          initialDate: selectedDate,
+                          firstDate: DateTime(2015, 8),
                           lastDate: DateTime(2101),
-                          initialDateRange: DateTimeRange(
-                              start: selectedStartDate, end: selectedEndDate),
-                        );
-
-                        if (picked != null) {
-                          setState(() {
-                            selectedStartDate = picked.start;
-                            selectedEndDate = picked.end;
-                            _fetchGlucoseDataWithRange();
+                          builder: (BuildContext context, Widget? child) {
+                            return Theme(
+                              data: ThemeData.light().copyWith(
+                                colorScheme: ColorScheme.light().copyWith(
+                                  background:
+                                      const Color.fromARGB(255, 243, 33, 173),
+                                ),
+                              ),
+                              child: child!,
+                            );
                           });
+
+                      if (picked != null && picked != selectedDate)
+                        setState(() {
+                          selectedDate = picked;
+                          _fetchGlucoseData(selectedDate);
+                        });
+                    }
+                  : _selectedChartType == ChartType.bar
+                      ? () async {
+                          final DateTimeRange? picked =
+                              await showDateRangePicker(
+                                  context: context,
+                                  firstDate: DateTime(2015),
+                                  lastDate: DateTime(2101),
+                                  initialDateRange: DateTimeRange(
+                                      start: selectedStartDate,
+                                      end: selectedEndDate),
+                                  builder:
+                                      (BuildContext context, Widget? child) {
+                                    return Theme(
+                                      data: ThemeData.light().copyWith(
+                                        colorScheme:
+                                            ColorScheme.light().copyWith(
+                                          background: const Color.fromARGB(
+                                              255, 243, 33, 173),
+                                        ),
+                                      ),
+                                      child: child!,
+                                    );
+                                  });
+
+                          if (picked != null) {
+                            setState(() {
+                              selectedStartDate = picked.start;
+                              selectedEndDate = picked.end;
+                              _fetchGlucoseDataWithRange();
+                            });
+                          }
                         }
-                      }
-                    : null,
-          ),
-          PopupMenuButton<ChartType>(
-            onSelected: (ChartType result) {
-              setState(() {
-                _selectedChartType = result;
-              });
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<ChartType>>[
-              const PopupMenuItem<ChartType>(
-                value: ChartType.line,
-                child: Text('Gráfico de Linha'),
-              ),
-              const PopupMenuItem<ChartType>(
-                value: ChartType.bar,
-                child: Text('Gráfico de Barra'),
-              ),
-            ],
-          ),
-          IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () {
-              generateAndSharePDF(userId, fullName, selectedStartDate,
-                  selectedEndDate.add(Duration(days: 30)));
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height * 0.5,
-            child: _buildChart(),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Text(
-                  dateRangeText,
-                  style: TextStyle(fontSize: 16),
+                      : null,
+            ),
+            PopupMenuButton<ChartType>(
+              onSelected: (ChartType result) {
+                setState(() {
+                  _selectedChartType = result;
+                });
+              },
+              itemBuilder: (BuildContext context) =>
+                  <PopupMenuEntry<ChartType>>[
+                const PopupMenuItem<ChartType>(
+                  value: ChartType.line,
+                  child: Text('Gráfico de Linha'),
                 ),
-                SizedBox(height: 5),
-                if (_selectedChartType == ChartType.bar)
-                  Text(
-                    'Tempo dentro do intervalo selecionado',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
+                const PopupMenuItem<ChartType>(
+                  value: ChartType.bar,
+                  child: Text('Gráfico de Barra'),
+                ),
               ],
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _navigateToPage,
-        type: BottomNavigationBarType.fixed,
-        items: [
-          _buildIcon(0, Icons.home, 'Home'),
-          _buildIcon(1, Icons.star, 'Metas'),
-          _buildIcon(2, Icons.equalizer, 'Registrar'),
-          _buildIcon(3, Icons.share, 'Relatórios'),
-          _buildIcon(4, Icons.person, 'Conta'),
-        ],
-      ),
-    );
+            IconButton(
+              icon: Icon(Icons.download_rounded),
+              onPressed: () {
+                generateAndSharePDF(userId, fullName, selectedStartDate,
+                    selectedEndDate.add(Duration(days: 30)));
+              },
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: _buildChart(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                    dateRangeText,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 5),
+                  if (_selectedChartType == ChartType.bar)
+                    Text(
+                      'Tempo dentro do intervalo selecionado',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: Navigation.NavigationBar(
+          currentIndex: 2,
+        ));
   }
 
   String _calculateDateRangeText(
@@ -562,11 +568,19 @@ class _HomePageChartState extends State<HomePageChart> {
       final file = File(filePath);
       await file.writeAsBytes(await pdf.save());
 
-      await FlutterShare.shareFile(
-        title: 'Relatório Glicêmico - $formattedStartDate a $formattedEndDate',
+      // await FlutterShare.shareFile(
+      //   title: 'Relatório Glicêmico - $formattedStartDate a $formattedEndDate',
+      //   text:
+      //       'Relatório PDF dos dados glicêmicos de $fullName de $formattedStartDate a $formattedEndDate.',
+      //   filePath: file.path,
+      // );
+
+      await Share.shareFiles(
+        ['${file.path}'],
         text:
-            'Relatório PDF dos dados glicêmicos de $fullName de $formattedStartDate a $formattedEndDate.',
-        filePath: file.path,
+            'Relatório Glicêmico de $fullName de $formattedStartDate a $formattedEndDate.',
+        subject:
+            'Relatório Glicêmico - $formattedStartDate a $formattedEndDate',
       );
     } catch (e) {
       print('Erro ao gerar e compartilhar PDF: $e');
@@ -575,9 +589,7 @@ class _HomePageChartState extends State<HomePageChart> {
 
   List<List<dynamic>> _generateTableData(
       List<Map<String, dynamic>> glucoseDataList) {
-        
     List<List<dynamic>> tableData = [
-
       [
         'Data',
         'Antes do café',
@@ -627,8 +639,6 @@ class _HomePageChartState extends State<HomePageChart> {
         ...mealColumns,
       ]);
     }
-
-    
 
     return tableData;
   }

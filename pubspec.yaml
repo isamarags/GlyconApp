@@ -51,7 +51,8 @@ dependencies:
 
   intl: ^0.18.1
 
-  flutter_native_timezone: ^2.0.0
+  flutter_native_timezone: 
+    path: /Users/isamaragalvao/Downloads/flutter_native_timezone
 
   sliding_up_panel: ^2.0.0+1
 
@@ -67,13 +68,9 @@ dependencies:
 
   pdf: ^3.6.0
   
-  share: ^2.0.4
-
-  share_plus: ^3.0.0
+  share_plus: ^6.0.0
 
   path_provider: ^2.1.2
-
-  flutter_share: ^2.0.0
 
   csv: ^6.0.0 
 
@@ -90,7 +87,7 @@ dependencies:
   avatar_glow: ^3.0.1
   flutter_initicon: ^3.0.0+1
   random_color: ^1.0.6-nullsafety
-
+  flashy_tab_bar2: ^0.0.10
 
 dev_dependencies:
   flutter_test:
@@ -164,3 +161,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
