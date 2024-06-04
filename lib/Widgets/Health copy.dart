@@ -156,28 +156,26 @@ class _ChangeHealthState extends State<ChangeHealth> {
                         children: [
                           Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
                           SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Último exame Fundoscopia',
-                                  style: GoogleFonts.montserrat(
-                                    color: Color(0xFFB98282),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Último exame Fundoscopia',
+                                style: GoogleFonts.montserrat(
+                                  color: Color(0xFFB98282),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
                                 ),
-                                Text(
-                                  '(Exame fundo de olho)',
-                                  style: GoogleFonts.montserrat(
-                                    color: Color(0xFFB98282),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                              ),
+                              Text(
+                                '(Exame fundo de olho)',
+                                style: GoogleFonts.montserrat(
+                                  color: Color(0xFFB98282),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -222,28 +220,26 @@ class _ChangeHealthState extends State<ChangeHealth> {
                         children: [
                           Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
                           SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Último exame RAC',
-                                  style: GoogleFonts.montserrat(
-                                    color: Color(0xFFB98282),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Último exame RAC',
+                                style: GoogleFonts.montserrat(
+                                  color: Color(0xFFB98282),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
                                 ),
-                                Text(
-                                  '(Relação Albumina/Creatinina)',
-                                  style: GoogleFonts.montserrat(
-                                    color: Color(0xFFB98282),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                              ),
+                              Text(
+                                '(Relação Albumina/Creatinina)',
+                                style: GoogleFonts.montserrat(
+                                  color: Color(0xFFB98282),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

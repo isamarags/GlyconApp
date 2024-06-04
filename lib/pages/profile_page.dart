@@ -121,14 +121,13 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showDeleteConfirmationDialog(BuildContext context) {
-    _dialogContext = context; // Armazena o BuildContext do modal
+    _dialogContext = context;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return DeleteConfirmationDialog(
           onDeleteConfirmed: () async {
-            await GetUserData.deleteAccount(
-                _dialogContext!); // Usa o BuildContext armazenado
+            await GetUserData.deleteAccount(_dialogContext!);
           },
         );
       },
@@ -274,6 +273,51 @@ class _ProfilePageState extends State<ProfilePage> {
     return newSubtitle;
   }
 
+  Widget buildRowItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: Color(0xFF4B0D07),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     String initials = getInitials(_userName);
@@ -291,167 +335,141 @@ class _ProfilePageState extends State<ProfilePage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Color(0x54D8A9A9),
+        backgroundColor: Color(0x45D8A9A9),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
           await _loadUserName();
         },
-        child: Center(
-          child: Column(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-                child: Container(
-                  color: Color(0x54D8A9A9),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: 55, right: 25, bottom: 40, top: 25),
-                        child: Initicon(
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+              child: Container(
+                height: 130,
+                color: Color(0x45D8A9A9),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Initicon(
                           text: initials,
                           backgroundColor: userBackgroundColor,
                           size: 70,
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Center(
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                _userName ?? '',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Color(0xFF4B0D07),
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w600,
-                                ),
+                        SizedBox(width: 20),
+                        Column(
+                          children: <Widget>[
+                            Text(
+                              _userName,
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Color(0xFF4B0D07),
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w600,
                               ),
-                              Text(
-                                '${_userGender ?? ''}, ${_userAge != null ? _userAge + ' anos' : 'Idade'}',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xFF808080),
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w400,
-                                ),
+                            ),
+                            Text(
+                              '${_userGender}, ${_userAge} anos',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF808080),
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w400,
                               ),
-                              Text(
-                                '${_userDiabetesType != null ? (_userDiabetesType == 'Gestacional' ? 'Diabetes ' + _userDiabetesType : 'Diabetes ' + _userDiabetesType) : ''}',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xFF808080),
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w400,
-                                ),
+                            ),
+                            Text(
+                              'Diabetes $_userDiabetesType',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF808080),
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w400,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              Expanded(
-                child: SingleChildScrollView(
+            ),
+            // Divider(
+            //   color: Colors.grey,
+            //   thickness: 0.2,
+            // ),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 35),
+                  padding: EdgeInsets.only(top: 20),
                   child: Column(
                     children: [
-                      // Padding(
-                      //   padding: const EdgeInsets.only(left: 50, top: 20),
-                      //   child: Align(
-                      //     alignment: Alignment.centerLeft,
-                      //     child: Text(
-                      //       'Registros de saúde',
-                      //       style: TextStyle(
-                      //         fontSize: 18,
-                      //         color: Color(0xFF4B0D07),
-                      //         fontFamily: 'Montserrat',
-                      //         fontWeight: FontWeight.w400,
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      // SizedBox(height: 20),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(left: 50, right: 40),
-                      //   child: Column(
-                      //     children: [
-                      //       buildRowItem(
-                      //         icon: Icons.person,
-                      //         title: 'Ver registros',
-                      //         subtitle: formatSubtitle(
-                      //             'Dados de saúde registrados anteriormente'),
-                      //         onTap: () {
-                      //           context.go('/teste');
-                      //         },
-                      //       ),
-                      //       SizedBox(height: 8),
-                      //       Divider(
-                      //         color: Colors.grey,
-                      //         thickness: 0.2,
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 50, top: 20),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Detalhes pessoais',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Color(0xFF4B0D07),
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 50, right: 40),
+                      Container(
                         child: Column(
                           children: [
-                            buildRowItem(
-                              icon: Icons.person,
-                              title: 'Perfil',
-                              subtitle: formatSubtitle('Nome, idade, gênero...'),
-                              onTap: () {
-                                context.go('/changeProfile');
-                              },
+                            InkWell(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Detalhes pessoais',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Color(0xFF4B0D07),
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
                             ),
-                            SizedBox(height: 8),
-                            Divider(
-                              color: Colors.grey,
-                              thickness: 0.2,
-                            ),
-                            SizedBox(height: 8),
-                            buildRowItem(
-                                icon: Icons.bloodtype,
-                                title: 'Saúde',
-                                subtitle: 'Tipo de diabetes, medicamentos...',
-                                onTap: () {
-                                  context.go('/changeHealth');
-                                }),
-                            SizedBox(height: 8),
-                            Divider(
-                              color: Colors.grey,
-                              thickness: 0.2,
+                            SizedBox(height: 20),
+                            InkWell(
+                              child: Column(
+                                children: [
+                                  buildRowItem(
+                                    icon: Icons.person,
+                                    title: 'Perfil',
+                                    subtitle: formatSubtitle(
+                                        'Nome, idade, gênero...'),
+                                    onTap: () {
+                                      context.go('/changeProfile');
+                                    },
+                                  ),
+                                  SizedBox(height: 8),
+                                  Divider(
+                                    color: Colors.grey,
+                                    thickness: 0.2,
+                                  ),
+                                  SizedBox(height: 8),
+                                  buildRowItem(
+                                    icon: Icons.bloodtype,
+                                    title: 'Saúde',
+                                    subtitle:
+                                        'Tipo de diabetes, medicamentos...',
+                                    onTap: () {
+                                      context.go('/changeHealth');
+                                    },
+                                  ),
+                                  SizedBox(height: 8),
+                                  Divider(
+                                    color: Colors.grey,
+                                    thickness: 0.2,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
                       SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 50),
+                      InkWell(
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
@@ -466,39 +484,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 50, right: 40),
+                      InkWell(
                         child: Column(
                           children: [
-                            // buildRowItem(
-                            //     icon: Icons.security,
-                            //     title: 'Segurança',
-                            //     subtitle: 'Alterar senha ou e-mail',
-                            //     onTap: () {}),
-                            // SizedBox(height: 8),
-                            // Divider(
-                            //   color: Colors.grey,
-                            //   thickness: 0.2,
-                            // ),
-                            // SizedBox(height: 8),
-                            // buildRowItem(
-                            //     icon: Icons.edit_document,
-                            //     title: 'Termos',
-                            //     subtitle: 'Leia nossos termos de uso',
-                            //     onTap: () {}),
-                            // SizedBox(height: 8),
-                            // Divider(
-                            //   color: Colors.grey,
-                            //   thickness: 0.2,
-                            // ),
-                            // SizedBox(height: 8),
                             buildRowItem(
-                                icon: Icons.logout,
-                                title: 'Sair',
-                                subtitle: 'Sair da sua conta',
-                                onTap: () async {
-                                  await GetUserData.signOut(context);
-                                }),
+                              icon: Icons.logout,
+                              title: 'Sair',
+                              subtitle: 'Sair da sua conta',
+                              onTap: () async {
+                                await GetUserData.signOut(context);
+                              },
+                            ),
                             SizedBox(height: 8),
                             Divider(
                               color: Colors.grey,
@@ -506,26 +502,27 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             SizedBox(height: 8),
                             buildRowItem(
-                                icon: Icons.delete_forever,
-                                title: 'Deletar conta',
-                                subtitle: 'Apagar todos os seus dados',
-                                onTap: () async {
-                                  _showDeleteConfirmationDialog(context);
-                                }),
+                              icon: Icons.delete_forever,
+                              title: 'Deletar conta',
+                              subtitle: 'Apagar todos os seus dados',
+                              onTap: () async {
+                                _showDeleteConfirmationDialog(context);
+                              },
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: Navigation.NavigationBar(
         currentIndex: 3,
-      )
+      ),
     );
   }
 }

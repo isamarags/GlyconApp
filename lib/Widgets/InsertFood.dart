@@ -159,7 +159,7 @@ class _InsertFoodState extends State<InsertFood> {
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: TextField(
                     controller: foodController,
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.text,
                     style: TextStyle(
                       color: Color(0xFF4B0D07),
                       fontWeight: FontWeight.w500,

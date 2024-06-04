@@ -29,30 +29,32 @@ class _InsertInsulinState extends State<InsertInsulin> {
   TextEditingController insulinLevelController = TextEditingController();
   TextEditingController dateTimeController = TextEditingController();
   String userId = '';
-  late String selectedInsulinType = '';
   late String selectedInsulin = '';
   late List<String> insulinOptions = [];
 
   @override
   void initState() {
     super.initState();
-    selectedDate = DateTime.now();
-    selectedTime = TimeOfDay.now();
-    userId = widget.userId;
-    selectedInsulinType = 'Basal';
-    selectedInsulin = 'Selecionar'; // Definindo como vazio inicialmente
-    FirebaseFunctions.fetchInsulinOptions().then((options) {
-      setState(() {
-        insulinOptions = options.toSet().toList(); // Remover duplicatas
-        if (insulinOptions.isNotEmpty) {
-          selectedInsulin =
-              insulinOptions[0]; // Definir o primeiro valor como selecionado
-        }
+    loadInsulin();
+  }
+
+  void loadInsulin() async {
+    try {
+      selectedDate = DateTime.now();
+      selectedTime = TimeOfDay.now();
+      userId = widget.userId;
+      selectedInsulin = '';
+      FirebaseFunctions.fetchInsulinOptions().then((options) {
+        setState(() {
+          insulinOptions = options.toSet().toList();
+          if (insulinOptions.isNotEmpty) {
+            selectedInsulin = insulinOptions[0];
+          }
+        });
       });
-    }).catchError((error) {
-      print('Erro ao buscar as opções de insulina: $error');
-      // Lidar com o erro conforme necessário
-    });
+    } catch (e) {
+      print('Erro ao buscar as opções de insulina: $e');
+    }
   }
 
   @override
@@ -187,8 +189,6 @@ class _InsertInsulinState extends State<InsertInsulin> {
                   onChanged: (newValue) {
                     setState(() {
                       selectedInsulin = newValue!;
-
-                      selectedInsulinType = newValue;
                     });
                   },
                   items:
@@ -340,7 +340,8 @@ class _InsertInsulinState extends State<InsertInsulin> {
             SizedBox(height: 15),
             ElevatedButton(
               onPressed: () {
-                if (insulinLevelController.text.isNotEmpty &&
+                if (dateTimeController.text.isNotEmpty &&
+                    insulinLevelController.text.isNotEmpty &&
                     beforeMealSelected != afterMealSelected &&
                     selectedInsulin.isNotEmpty) {
                   FirebaseFunctions.saveInsulinDataToFirestore(
@@ -348,7 +349,7 @@ class _InsertInsulinState extends State<InsertInsulin> {
                     insulinValue: insulinLevelController.text,
                     beforeMealSelected: beforeMealSelected,
                     afterMealSelected: afterMealSelected,
-                    insulinType: selectedInsulinType,
+                    insulinType: selectedInsulin,
                     userId: userId,
                   );
                   widget.closeOptionsPanel();

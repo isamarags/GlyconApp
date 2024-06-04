@@ -41,47 +41,42 @@ class _AddOptionsPanelState extends State<AddOptionsPanel> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Defina a porcentagem do tamanho da tela que você quer para o padding
-    final double verticalPaddingPercent = 0.05; // 5% do tamanho da tela
-    final double horizontalPaddingPercent = 0.1; // 10% do tamanho da tela
+    final double verticalPaddingPercent = 0.05; 
+    final double horizontalPaddingPercent = 0.1; 
 
     final double verticalPadding = screenHeight * verticalPaddingPercent;
     final double horizontalPadding = screenWidth * horizontalPaddingPercent;
 
     void _updateGlucoseValue() {
-      // Atualiza o valor da glicose com o novo valor
       setState(() {
         widget.glucoseValue = widget.newGlucoseValue!;
       });
-      // Chama a função onDataRegistered para notificar a página inicial
       widget.onDataRegistered();
+      widget.onClose();
     }
 
     void _updatePillValue() {
-      // Atualiza o valor do medicamento com o novo valor
       setState(() {
         widget.pillValue = widget.newPillValue!;
       });
-      // Chama a função onDataRegistered para notificar a página inicial
       widget.onDataRegistered();
+      widget.onClose();
     }
 
     void _updateFoodValue() {
-      // Atualiza o valor do alimento com o novo valor
       setState(() {
         widget.foodValue = widget.newFoodValue!;
       });
-      // Chama a função onDataRegistered para notificar a página inicial
       widget.onDataRegistered();
+      widget.onClose();
     }
 
     void _updateInsulinValue() {
-      // Atualiza o valor da insulina com o novo valor
       setState(() {
         widget.insulinValue = widget.newInsulinValue!;
       });
-      // Chama a função onDataRegistered para notificar a página inicial
       widget.onDataRegistered();
+      widget.onClose();
     }
 
     // void _navigateToPage(int index) {

@@ -100,41 +100,6 @@ class _LandingPageState extends State<LandingPage> {
     }
   }
 
-  void _showSlidingUpPanel() async {
-    try {
-      String userId =
-          await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
-
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) {
-          return AddOptionsPanel(
-            userId: userId,
-            onDataRegistered: () async {
-              await _loadAllData();
-              Navigator.pop(context);
-            },
-            glucoseValue: widget.glucoseValue,
-            newGlucoseValue: widget.newGlucoseValue,
-            newPillValue: widget.newPillValue,
-            pillValue: widget.pillValue,
-            newFoodValue: widget.newFoodValue,
-            foodValue: widget.foodValue,
-            newInsulinValue: widget.newInsulinValue,
-            insulinValue: widget.insulinValue,
-            onClose: () {
-              Navigator.pop(context);
-            },
-          );
-        },
-      );
-    } catch (e) {
-      print('Erro ao obter o userId do Firestore: $e');
-    }
-  }
-
   Future<void> _loadLatestGlucoseData() async {
     String userId =
         await firebaseService.FirebaseFunctions.getUserIdFromFirestore();
@@ -237,12 +202,7 @@ class _LandingPageState extends State<LandingPage> {
           return RefreshIndicator(
             child: SingleChildScrollView(),
             onRefresh: () async {
-              await _loadUserName();
-              await _loadUserData();
-              await _loadLatestGlucoseData();
-              await _loadLatestInsulinData();
-              await _loadLatestFoodData();
-              await _loadLatestMedicationData();
+              await _loadAllData();
             },
           );
         } else {
@@ -255,12 +215,7 @@ class _LandingPageState extends State<LandingPage> {
             backgroundColor: Colors.white,
             body: RefreshIndicator(
               onRefresh: () async {
-                await _loadUserName();
-                await _loadUserData();
-                await _loadLatestGlucoseData();
-                await _loadLatestInsulinData();
-                await _loadLatestFoodData();
-                await _loadLatestMedicationData();
+                await _loadAllData();
               },
               child: SingleChildScrollView(
                 physics: AlwaysScrollableScrollPhysics(),

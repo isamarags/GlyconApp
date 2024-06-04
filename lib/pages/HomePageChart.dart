@@ -167,106 +167,6 @@ class _HomePageChartState extends State<HomePageChart> {
     }
   }
 
-  // void _navigateToPage(index) {
-  //   final router = GoRouter.of(context);
-  //   switch (index) {
-  //     case 0:
-  //       router.go('/homePage');
-  //       break;
-  //     // case 1:
-  //     //   router.go('/metas');
-  //     //   break;
-  //     case 1:
-  //       _showSlidingUpPanel();
-  //       break;
-  //     case 2:
-  //       router.go('/charts');
-  //       break;
-  //     case 3:
-  //       router.go('/profilePage');
-  //       break;
-  //   }
-  //   print('Página selecionada: $index');
-  // }
-
-  // void _onNavigationItemSelected(int index) {
-  //   setState(() {
-  //     _selectedIndex = index;
-  //   });
-  //   return _navigateToPage(index);
-  // }
-
-  // BottomNavigationBarItem _buildIcon(int index, IconData icon, String label) {
-  //   final customItem = CustomBottomNavigationBarItem(
-  //     index: index,
-  //     icon: icon,
-  //     label: label,
-  //     selectedIndex: _selectedIndex,
-  //     onTap: () => _onNavigationItemSelected(index),
-  //   );
-
-  //   return BottomNavigationBarItem(
-  //     icon: Icon(customItem.icon),
-  //     label: customItem.label,
-  //   );
-  // }
-
-  // Future<void> _loadLatestGlucoseData() async {
-  //   String userId = await FirebaseFunctions.getUserIdFromFirestore();
-  //   Map<String, dynamic>? glucoseData =
-  //       await FirebaseFunctions.getLatestGlucoseDataFromFirestore(userId);
-  //   String glucoseLevelString = glucoseData['glucoseLevel'];
-  //   int glucoseLevel = int.tryParse(glucoseLevelString) ?? 0;
-  //   setState(() {
-  //     widget.glucoseValue = glucoseLevel.toString();
-  //   });
-  // }
-
-  // Future<void> _loadLatestInsulinData() async {
-  //   String userId = await FirebaseFunctions.getUserIdFromFirestore();
-  //   Map<String, dynamic>? insulinData =
-  //       await FirebaseFunctions.getLatestInsulinDataFromFirestore(userId);
-  //   String insulinValue = insulinData['insulinValue'];
-  //   setState(() {
-  //     widget.insulinValue = insulinValue;
-  //   });
-  // }
-
-  // void _showSlidingUpPanel() async {
-  //   try {
-  //     String userId = await FirebaseFunctions.getUserIdFromFirestore();
-
-  //     showModalBottomSheet(
-  //       context: context,
-  //       isScrollControlled: true,
-  //       backgroundColor: Colors.transparent,
-  //       builder: (context) {
-  //         return AddOptionsPanel(
-  //           userId: userId,
-  //           onDataRegistered: () async {
-  //             await _loadLatestGlucoseData();
-  //             Navigator.pop(context);
-  //           },
-  //           glucoseValue: widget.glucoseValue,
-  //           newGlucoseValue: widget.newGlucoseValue,
-  //           newPillValue: widget.newPillValue,
-  //           pillValue: widget.pillValue,
-  //           newFoodValue: widget.newFoodValue,
-  //           foodValue: widget.foodValue,
-  //           newInsulinValue: widget.newInsulinValue,
-  //           insulinValue: widget.insulinValue,
-  //           onClose: () {
-  //             Navigator.pop(context);
-  //             _navigateToPage(2);
-  //           },
-  //         );
-  //       },
-  //     );
-  //   } catch (e) {
-  //     print('Erro ao obter o userId do Firestore: $e');
-  //   }
-  // }
-
   Widget _buildChart() {
     switch (_selectedChartType) {
       case ChartType.line:
@@ -343,7 +243,7 @@ class _HomePageChartState extends State<HomePageChart> {
   @override
   Widget build(BuildContext context) {
     String dateRangeText = _selectedChartType == ChartType.line
-        ? DateFormat.yMMMd().format(selectedDate)
+        ? _calculateDateRangeText(selectedDate, selectedDate)
         : _calculateDateRangeText(selectedStartDate, selectedEndDate);
 
     return Scaffold(

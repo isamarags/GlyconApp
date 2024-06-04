@@ -14,7 +14,6 @@ import 'package:glycon_app/Widgets/About.dart';
 import 'package:glycon_app/Widgets/Health.dart';
 import 'package:glycon_app/Widgets/ViewHistory.dart';
 import 'package:glycon_app/pages/home_page.dart';
-import 'package:glycon_app/pages/metasPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:glycon_app/pages/profile_page.dart';
@@ -105,18 +104,6 @@ final GoRouter _router = GoRouter(routes: <RouteBase>[
     },
   ),
 
-  GoRoute(
-    path: '/metas',
-    builder: (BuildContext context, GoRouterState state) {
-      return MetasPage();
-    },
-  ),
-  // GoRoute(
-  //   path: '/relatorios',
-  //   builder: (BuildContext context, GoRouterState state) {
-  //     return GlicemicIndexChart();
-  //   },
-  // ),
   GoRoute(
     path: '/profilePage',
     builder: (BuildContext context, GoRouterState state) {

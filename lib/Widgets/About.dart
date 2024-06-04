@@ -98,17 +98,15 @@ class _AboutState extends State<About> {
         child: ListView(
           children: [
             Container(
-              width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.symmetric(horizontal: 39),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
-                // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 10),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Nos conte mais sobre você',
+                      'Informações pessoais',
                       style: GoogleFonts.montserrat(
                         color: Color(0xFF4B0D07),
                         fontSize: 22,
@@ -127,26 +125,24 @@ class _AboutState extends State<About> {
                     ),
                   ),
                   SizedBox(height: 50),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(Icons.person, color: Color(0xFF4B0D07)),
+                      Row(
+                        children: [
+                          Icon(Icons.person, color: Color(0xFF4B0D07)),
+                          SizedBox(width: 10),
+                          Text(
+                            'Genero',
+                            style: GoogleFonts.montserrat(
+                              color: Color(0xFFB98282),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 10),
-                      Text(
-                        'Genero',
-                        style: GoogleFonts.montserrat(
-                            color: Color(0xFFB98282),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      SizedBox(width: 100),
+                      SizedBox(height: 10),
                       DropdownButton<String>(
                         value: selectedGender,
                         onChanged: (String? newGender) {
@@ -168,37 +164,32 @@ class _AboutState extends State<About> {
                           );
                         }).toList(),
                       ),
-                      Spacer(),
                     ],
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                   Divider(
                     color: Color(0xFFF0F0F0),
                     thickness: 1,
                   ),
-                  SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  SizedBox(height: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(Icons.calendar_today,
-                            color: Color(0xFF4B0D07)),
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
+                          SizedBox(width: 10),
+                          Text(
+                            'Data de nascimento',
+                            style: GoogleFonts.montserrat(
+                              color: Color(0xFFB98282),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 10),
-                      Text(
-                        'Data de nascimento',
-                        style: GoogleFonts.montserrat(
-                          color: Color(0xFFB98282),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Spacer(),
+                      SizedBox(height: 10),
                       GestureDetector(
                         onTap: () {
                           showDatePicker(
@@ -225,34 +216,30 @@ class _AboutState extends State<About> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                   Divider(
                     color: Color(0xFFF0F0F0),
                     thickness: 1,
                   ),
-                  SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  SizedBox(height: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(Icons.fitness_center,
-                            color: Color(0xFF4B0D07)),
+                      Row(
+                        children: [
+                          Icon(Icons.fitness_center, color: Color(0xFF4B0D07)),
+                          SizedBox(width: 10),
+                          Text(
+                            'Peso (kg)',
+                            style: GoogleFonts.montserrat(
+                              color: Color(0xFFB98282),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 10),
-                      Text(
-                        'Peso (kg)',
-                        style: GoogleFonts.montserrat(
-                          color: Color(0xFFB98282),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Spacer(),
+                      SizedBox(height: 10),
                       GestureDetector(
                         onTap: () => openWeightPicker(context),
                         child: Text(
@@ -268,33 +255,30 @@ class _AboutState extends State<About> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                   Divider(
                     color: Color(0xFFF0F0F0),
                     thickness: 1,
                   ),
-                  SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  SizedBox(height: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        height: 24,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(Icons.height, color: Color(0xFF4B0D07)),
+                      Row(
+                        children: [
+                          Icon(Icons.height, color: Color(0xFF4B0D07)),
+                          SizedBox(width: 10),
+                          Text(
+                            'Altura (cm)',
+                            style: GoogleFonts.montserrat(
+                              color: Color(0xFFB98282),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 10),
-                      Text(
-                        'Altura (cm)',
-                        style: GoogleFonts.montserrat(
-                          color: Color(0xFFB98282),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Spacer(),
-                      Spacer(),
+                      SizedBox(height: 10),
                       GestureDetector(
                         onTap: () => openHeightSelectionDialog(context),
                         child: Text(
@@ -310,7 +294,7 @@ class _AboutState extends State<About> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 100),
+                  SizedBox(height: 80),
                   ElevatedButton(
                     onPressed: () async {
                       String userId =
@@ -367,6 +351,66 @@ class _AboutState extends State<About> {
 
                         context.go('/health');
                       }
+
+                      // if (selectedGender == "Editar") {
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text(
+                      //           'Por favor, selecione um gênero antes de continuar'),
+                      //       duration: Duration(seconds: 2),
+                      //     ),
+                      //   );
+                      //   return;
+                      // } else if (selectedWeight == null ||
+                      //     selectedWeight == 0.0) {
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text(
+                      //           'Por favor, selecione um peso antes de continuar'),
+                      //       duration: Duration(seconds: 2),
+                      //     ),
+                      //   );
+                      //   return;
+                      // } else if (selectedHeight == null ||
+                      //     selectedHeight == 0.0) {
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text(
+                      //           'Por favor, selecione uma altura antes de continuar'),
+                      //       duration: Duration(seconds: 2),
+                      //     ),
+                      //   );
+                      //   return;
+                      // } else if (selectedDate == null ||
+                      //     selectedDate.day == DateTime.now().day) {
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text(
+                      //           'Por favor, selecione uma data de nascimento antes de continuar'),
+                      //       duration: Duration(seconds: 2),
+                      //     ),
+                      //   );
+                      //   return;
+                      // } else {
+                      //   await GetUserData.saveUserGenderToFirestore(
+                      //       userId, selectedGender);
+                      //   await GetUserData.saveUserHeightToFirestore(
+                      //       userId, selectedHeight!.toDouble());
+                      //   await GetUserData.saveUserWeightToFirestore(
+                      //       userId, selectedWeight!);
+                      //   await GetUserData.saveUserBirthDateToFirestore(
+                      //       userId, selectedDate);
+
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text('Dados atualizados com sucesso!'),
+                      //       duration: Duration(seconds: 2),
+                      //     ),
+                      //   );
+
+                      //   context.go('/profilePage');
+                      // }
+                      // },
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFD8A9A9),

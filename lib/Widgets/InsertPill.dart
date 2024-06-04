@@ -164,7 +164,7 @@ class _InsertPillState extends State<InsertPill> {
                       });
                     },
                     controller: namePillController,
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.text,
                     style: TextStyle(
                       color: Color(0xFF4B0D07),
                       fontWeight: FontWeight.w500,

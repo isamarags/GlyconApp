@@ -18,14 +18,6 @@ class _HealthState extends State<Health> {
   List<String> typeDiabetes = ["Selecionar", "Tipo 1", "Tipo 2", "Gestacional"];
   String typeDiabetesSelected = "Selecionar";
 
-  List<String> optionsTreatment = [
-    "Medicamento",
-    "Insulina",
-    "Dieta",
-    "Exercício físico"
-  ];
-  List<String> selectedTreatments = [];
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -44,76 +36,59 @@ class _HealthState extends State<Health> {
       body: Container(
         width: screenWidth,
         height: screenHeight,
-        padding: EdgeInsets.symmetric(horizontal: 39),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+        child: ListView(
           children: [
-            SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Informações de saúde',
-                style: GoogleFonts.montserrat(
-                  color: Color(0xFF4B0D07),
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                ),
-                textAlign: TextAlign.justify,
-              ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Seus parâmetros individuais são importantes para uma personalização detalhada',
-              style: GoogleFonts.montserrat(
-                color: Color(0xFFB98282),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            SizedBox(height: 40),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.bloodtype_rounded,
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 39),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Informações de saúde',
+                      style: GoogleFonts.montserrat(
                         color: Color(0xFF4B0D07),
-                        size: 28,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
                       ),
+                      textAlign: TextAlign.justify,
                     ),
-                    SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Tipo de diabetes',
-                          style: GoogleFonts.montserrat(
-                            color: Color(0xFFB98282),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Seus parâmetros individuais são importantes para uma personalização detalhada',
+                    style: GoogleFonts.montserrat(
+                      color: Color(0xFFB98282),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 40),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.bloodtype_rounded,
+                            color: Color(0xFF4B0D07),
+                            size: 28,
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 165,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
+                          SizedBox(width: 10),
+                          Text(
+                            'Tipo de diabetes',
+                            style: GoogleFonts.montserrat(
+                              color: Color(0xFFB98282),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                      child: DropdownButton<String>(
+                      SizedBox(height: 10),
+                      DropdownButton<String>(
                         value: typeDiabetesSelected,
                         onChanged: (String? newTypeDiabetes) {
                           setState(() {
@@ -133,203 +108,190 @@ class _HealthState extends State<Health> {
                             ),
                           );
                         }).toList(),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-            SizedBox(height: 30),
-            Divider(
-              color: Color(0xFFF0F0F0),
-              thickness: 1,
-            ),
-            SizedBox(height: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child:
-                          Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
-                    ),
-                    SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Último exame Fundoscopia',
-                          style: GoogleFonts.montserrat(
-                            color: Color(0xFFB98282),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Text(
-                          '(Exame fundo de olho)',
-                          style: GoogleFonts.montserrat(
-                            color: Color(0xFFB98282),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 195,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        showDatePicker(
-                          context: context,
-                          initialDate: selectedFundoscopiaDate,
-                          firstDate: DateTime(1900),
-                          lastDate: DateTime.now(),
-                        ).then((date) {
-                          if (date != null && date != selectedFundoscopiaDate) {
-                            setState(() {
-                              selectedFundoscopiaDate = date;
-                            });
-                          }
-                        });
-                      },
-                      child: Text(
-                        '${selectedFundoscopiaDate.day}/${selectedFundoscopiaDate.month}/${selectedFundoscopiaDate.year}',
-                        style: GoogleFonts.montserrat(
-                          color: Color(0xFF4B0D07),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-            SizedBox(height: 30),
-            Divider(
-              color: Color(0xFFF0F0F0),
-              thickness: 1,
-            ),
-            SizedBox(height: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child:
-                          Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
-                    ),
-                    SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Último exame RAC',
-                          style: GoogleFonts.montserrat(
-                            color: Color(0xFFB98282),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Text(
-                          '(Relação Albumina/Creatinina)',
-                          style: GoogleFonts.montserrat(
-                            color: Color(0xFFB98282),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 195,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        showDatePicker(
-                          context: context,
-                          initialDate: selectedRACDate,
-                          firstDate: DateTime(1900),
-                          lastDate: DateTime.now(),
-                        ).then((date) {
-                          if (date != null && date != selectedRACDate) {
-                            setState(() {
-                              selectedRACDate = date;
-                            });
-                          }
-                        });
-                      },
-                      child: Text(
-                        '${selectedRACDate.day}/${selectedRACDate.month}/${selectedRACDate.year}',
-                        style: GoogleFonts.montserrat(
-                          color: Color(0xFF4B0D07),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-            SizedBox(height: 90),
-            ElevatedButton(
-              onPressed: () async {
-                String userId =
-                    await FirebaseFunctions.getUserIdFromFirestore();
-
-                GetUserData.saveUserDiabetesTypeToFirestore(
-                    userId, typeDiabetesSelected);
-                GetUserData.saveUserFundoscopiaDateToFirestore(
-                    userId, selectedFundoscopiaDate);
-                GetUserData.saveUserRACDateToFirestore(userId, selectedRACDate);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Dados salvos com sucesso!'),
-                    duration: Duration(seconds: 2),
+                      )
+                    ],
                   ),
-                );
+                  SizedBox(height: 20),
+                  Divider(
+                    color: Color(0xFFF0F0F0),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Último exame Fundoscopia',
+                                  style: GoogleFonts.montserrat(
+                                    color: Color(0xFFB98282),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                Text(
+                                  '(Exame fundo de olho)',
+                                  style: GoogleFonts.montserrat(
+                                    color: Color(0xFFB98282),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: selectedFundoscopiaDate,
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                          ).then((date) {
+                            if (date != null &&
+                                date != selectedFundoscopiaDate) {
+                              setState(() {
+                                selectedFundoscopiaDate = date;
+                              });
+                            }
+                          });
+                        },
+                        child: Text(
+                          '${selectedFundoscopiaDate.day}/${selectedFundoscopiaDate.month}/${selectedFundoscopiaDate.year}',
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFF4B0D07),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Divider(
+                    color: Color(0xFFF0F0F0),
+                    thickness: 1,
+                  ),
+                  SizedBox(height: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today, color: Color(0xFF4B0D07)),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Último exame RAC',
+                                  style: GoogleFonts.montserrat(
+                                    color: Color(0xFFB98282),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                Text(
+                                  '(Relação Albumina/Creatinina)',
+                                  style: GoogleFonts.montserrat(
+                                    color: Color(0xFFB98282),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: selectedRACDate,
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                          ).then((date) {
+                            if (date != null && date != selectedRACDate) {
+                              setState(() {
+                                selectedRACDate = date;
+                              });
+                            }
+                          });
+                        },
+                        child: Text(
+                          '${selectedRACDate.day}/${selectedRACDate.month}/${selectedRACDate.year}',
+                          style: GoogleFonts.montserrat(
+                            color: Color(0xFF4B0D07),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 90),
+                  ElevatedButton(
+                    onPressed: () async {
+                      String userId =
+                          await FirebaseFunctions.getUserIdFromFirestore();
 
-                context.go('/homePage');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFD8A9A9),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                minimumSize: Size(250, 54),
-              ),
-              child: Text(
-                'Continuar',
-                style: GoogleFonts.montserrat(
-                  color: Color(0xFF4B0D07),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w400,
-                ),
+                      if (typeDiabetesSelected == "Selecionar") {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Por favor, selecione um tipo de diabetes antes de continuar'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      } else {
+                        await GetUserData.saveUserDiabetesTypeToFirestore(
+                            userId, typeDiabetesSelected);
+                        await GetUserData.saveUserFundoscopiaDateToFirestore(
+                            userId, selectedFundoscopiaDate);
+                        await GetUserData.saveUserRACDateToFirestore(
+                            userId, selectedRACDate);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Dados salvos com sucesso!'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+
+                      context.go('/homePage');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFD8A9A9),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      minimumSize: Size(250, 54),
+                    ),
+                    child: Text(
+                      'Continuar',
+                      style: GoogleFonts.montserrat(
+                        color: Color(0xFF4B0D07),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

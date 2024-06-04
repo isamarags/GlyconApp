@@ -8,6 +8,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Colors.white,
       title: Text("Confirmar exclusão"),
       content: Text("Tem certeza de que deseja excluir sua conta? Esta ação não pode ser desfeita."),
       actions: <Widget>[

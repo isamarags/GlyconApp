@@ -161,7 +161,9 @@ class _NavigationBarState extends State<NavigationBar> {
             foodValue: widget.foodValue,
             newInsulinValue: widget.newInsulinValue,
             insulinValue: widget.insulinValue,
-            onClose: () {
+            onClose: () async {
+              await _loadAllData();
+              setState(() {});
               Navigator.pop(context);
             },
           );
