@@ -180,32 +180,6 @@ class FirebaseFunctions {
     }
   }
 
-  // get user name
-  static Future<String> getUserNameFromFirestore() async {
-    try {
-      String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-      if (userId.isNotEmpty) {
-        DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .get();
-        if (userSnapshot.exists) {
-          Map<String, dynamic> userData =
-              userSnapshot.data() as Map<String, dynamic>;
-          String fullName = userData['fullName'] ?? '';
-          if (fullName.isNotEmpty) {
-            List<String> names = fullName.split(' ');
-            return names.first;
-          }
-        }
-      }
-      return '';
-    } catch (e) {
-      print('Erro ao obter o nome do usuário do Firestore: $e');
-      return '';
-    }
-  }
-
   static Future<String> getUserIdFromFirestore() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;

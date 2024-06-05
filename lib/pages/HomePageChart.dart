@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:glycon_app/Widgets/NavigationBar.dart' as Navigation;
+import 'package:glycon_app/services/getUserName.dart';
 
 class _GlicemiaData {
   final DateTime time;
@@ -71,7 +72,8 @@ class _HomePageChartState extends State<HomePageChart> {
   }
 
   Future<void> _fetchUserInfo() async {
-    fullName = await FirebaseFunctions.getUserNameFromFirestore();
+    print('Fetching user info...');
+    fullName = await GetUserName.getFullNameFromFirestore();
     userId = await FirebaseFunctions.getUserIdFromFirestore();
   }
 
@@ -475,12 +477,10 @@ class _HomePageChartState extends State<HomePageChart> {
       //   filePath: file.path,
       // );
 
-      await Share.shareFiles(
-        ['${file.path}'],
-        text:
-            'Relatório Glicêmico de $fullName de $formattedStartDate a $formattedEndDate.',
+      await Share.shareXFiles(
+        [XFile('${file.path}')],
         subject:
-            'Relatório Glicêmico - $formattedStartDate a $formattedEndDate',
+            'Relatório Glicêmico de $fullName de $formattedStartDate a $formattedEndDate.',
       );
     } catch (e) {
       print('Erro ao gerar e compartilhar PDF: $e');

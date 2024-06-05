@@ -6,6 +6,7 @@ import 'package:glycon_app/services/FirebaseFunctions.dart' as firebaseService;
 import 'package:glycon_app/Widgets/AddOptionsPanel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_initicon/flutter_initicon.dart';
+import 'package:glycon_app/services/getUserName.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
@@ -142,7 +143,7 @@ class _ViewHistoryState extends State<ViewHistory> {
 
   Future<void> _loadUserName() async {
     String userName =
-        await firebaseService.FirebaseFunctions.getUserNameFromFirestore();
+        await GetUserName.getUserNameFromFirestore();
     setState(() {
       _userName = userName;
     });

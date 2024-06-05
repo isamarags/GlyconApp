@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:glycon_app/Widgets/GestureDetectorProfile.dart';
 import 'package:glycon_app/Widgets/DeleteConfirmationDialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:glycon_app/services/FirebaseFunctions.dart' as firebaseService;
@@ -9,12 +8,9 @@ import 'package:glycon_app/Widgets/CustomBottomNavigationBarItem.dart';
 import 'package:glycon_app/Widgets/NavigationBar.dart' as Navigation;
 import 'package:flutter_initicon/flutter_initicon.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:glycon_app/services/getUserName.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
-
-import 'package:glycon_app/pages/HomePageChart.dart';
-import 'package:glycon_app/pages/home_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String? newGlucoseValue;
@@ -54,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadUserName() async {
     String userName =
-        await firebaseService.FirebaseFunctions.getUserNameFromFirestore();
+        await GetUserName.getUserNameFromFirestore();
     setState(() {
       _userName = userName;
     });

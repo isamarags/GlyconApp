@@ -26,46 +26,55 @@ class BuildHealthItemGlucose extends StatelessWidget {
             color: Color.fromARGB(255, 240, 242, 244),
             blurRadius: 8.0,
             spreadRadius: 10.0,
-            // offset: Offset(5, 10),
           ),
         ],
       ),
       child: Container(
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(width: 10),
-              Flexible(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      softWrap: false,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 20,
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+        ),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            double titleFontSize = constraints.maxWidth * 0.1;
+            double descriptionFontSize = constraints.maxWidth * 0.08;
+            
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 10),
+                Flexible(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: titleFontSize,
                           color: Color(0xFF4B0D07),
-                          fontWeight: FontWeight.w500),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: backgroundColor,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 5),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          fontSize: descriptionFontSize,
+                          color: backgroundColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          )),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:glycon_app/Widgets/HeightSelectionDialog.dart';
 import 'package:glycon_app/Widgets/WeightPicker.dart';
 import 'package:glycon_app/Services/FirebaseFunctions.dart';
 import 'package:glycon_app/services/getUserData.dart';
+import 'package:glycon_app/services/getUserName.dart';
 // import 'package:glycon_app/services/updateUserData.dart';
 
 class ChangeProfile extends StatefulWidget {
@@ -42,7 +43,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
     try {
       String userId = await FirebaseFunctions.getUserIdFromFirestore();
 
-      String currentName = await FirebaseFunctions.getUserNameFromFirestore();
+      String currentName = await GetUserName.getFullNameFromFirestore();
       nameController.text = currentName;
 
       String currentGender =
@@ -168,8 +169,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                           onSubmitted: (newName) async {
                             String userId = await FirebaseFunctions
                                 .getUserIdFromFirestore();
-                            String currentName = await FirebaseFunctions
-                                .getUserNameFromFirestore();
+                            String currentName = await GetUserName.getUserNameFromFirestore();
                             nameController.text = currentName;
 
                             if (newName != null && newName.isNotEmpty) {

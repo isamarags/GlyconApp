@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:glycon_app/Widgets/AddOptionsPanel.dart';
 import 'package:glycon_app/Widgets/BuildHealthItem.dart';
 import 'package:glycon_app/Widgets/BuildHealthItemGlucose.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,13 +8,8 @@ import 'package:flutter_initicon/flutter_initicon.dart';
 import 'package:random_color/random_color.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:go_router/go_router.dart';
 import 'package:glycon_app/Widgets/NavigationBar.dart' as Navigation;
-
-import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
-import 'package:glycon_app/Widgets/CustomBottomNavigationBarItem.dart';
-import 'package:glycon_app/pages/HomePageChart.dart';
-import 'package:glycon_app/pages/profile_page.dart';
+import 'package:glycon_app/services/getUserName.dart';
 
 class LandingPage extends StatefulWidget {
   final String? newGlucoseValue;
@@ -53,7 +47,7 @@ class _LandingPageState extends State<LandingPage> {
   String _userId = '';
   bool _firstTimeUser = true;
   FirebaseAuth auth = FirebaseAuth.instance;
-  RandomColor _randomColor = RandomColor();
+  // RandomColor _randomColor = RandomColor();
 
   void _setGreeting() {
     DateTime now = DateTime.now();
@@ -72,7 +66,7 @@ class _LandingPageState extends State<LandingPage> {
 
   Future<void> _loadUserName() async {
     String userName =
-        await firebaseService.FirebaseFunctions.getUserNameFromFirestore();
+        await GetUserName.getUserNameFromFirestore();
     setState(() {
       _userName = userName;
     });
@@ -196,7 +190,7 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: firebaseService.FirebaseFunctions.getUserNameFromFirestore(),
+      future: GetUserName.getUserNameFromFirestore(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return RefreshIndicator(

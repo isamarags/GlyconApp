@@ -4,6 +4,7 @@ import 'package:glycon_app/services/FirebaseFunctions.dart' as firebaseService;
 import 'package:glycon_app/Widgets/AddOptionsPanel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:glycon_app/services/getUserName.dart';
 import 'package:glycon_app/Widgets/CustomBottomNavigationBarItem.dart';
 
 class NavigationBar extends StatefulWidget {
@@ -114,7 +115,7 @@ class _NavigationBarState extends State<NavigationBar> {
 
   Future<void> _loadUserName() async {
     String userName =
-        await firebaseService.FirebaseFunctions.getUserNameFromFirestore();
+        await GetUserName.getUserNameFromFirestore();
     setState(() {
       _userName = userName;
     });
